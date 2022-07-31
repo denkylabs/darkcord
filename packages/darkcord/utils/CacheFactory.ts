@@ -1,4 +1,5 @@
 import {BaseClient} from "../client/BaseClient.ts"
+import {GuildCache} from "../cache/GuildCache.ts"
 
 export const CacheOff = 0
 export const DefaultCache = 100
@@ -29,8 +30,7 @@ export class CacheFactory {
 
     this.options = Object.freeze(options)
   }
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   makeGuildCache () {
-
+    return new GuildCache(this.options.GuildCache)
   }
 }
