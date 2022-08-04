@@ -1,6 +1,19 @@
 import {Snowflake} from "discord-api-types/v10"
+import {BaseClient} from "../client/BaseClient.ts"
 
 type TWithID<T> = T & { id?: Snowflake | string }
+
+export interface CacheFetchOptions {
+  id: string;
+  /**
+   * Rest for object
+   */
+  client: BaseClient;
+  /**
+   * Returns api object instead of structure
+   */
+  api?: boolean
+}
 
 export class Cache<T = unknown> extends Map<string, T> {
   readonly #limit: number
