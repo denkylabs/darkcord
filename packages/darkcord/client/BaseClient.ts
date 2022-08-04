@@ -2,9 +2,11 @@ import {Rest} from "darkcord/rest"
 import EventEmitter from "deno/events"
 import {ClientEvents} from "../Events.ts"
 import {CacheFactory, CacheFactoryOptions} from "../utils/CacheFactory.ts"
+import {GuildCache} from "../cache/GuildCache.ts"
 
 export interface ClientCache<Options = false> {
-    factory: Options extends true ? CacheFactoryOptions : CacheFactory
+  guilds: GuildCache
+  factory: Options extends true ? CacheFactoryOptions : CacheFactory
 }
 
 export abstract class BaseClient extends EventEmitter {
@@ -17,8 +19,10 @@ export abstract class BaseClient extends EventEmitter {
     if (cache.factory instanceof CacheFactory) {
       this.cache = cache as unknown as ClientCache<false>
     } else {
+      const factory = new CacheFactory(cache.factory as CacheFactoryOptions, this)
       this.cache = {
-        factory: new CacheFactory(cache.factory as CacheFactoryOptions, this)
+        factory,
+        guilds: factory.makeGuildCache()
       }
     }
   }
