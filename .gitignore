@@ -3,4 +3,5 @@
 /packages/darkcord/node
 /node_modules
 /node
+/.vscode
 **/**.dnt.ts
