@@ -2,3 +2,5 @@
 /packages/darkcord/node-interpreter
 /packages/darkcord/node
 /node_modules
+/node
+**/**.dnt.ts

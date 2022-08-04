@@ -1,4 +1,4 @@
-import {APIRole, APIRoleTags, Snowflake} from "discord-api-types/v10.ts"
+import {APIRole, APIRoleTags, Snowflake} from "discord-api-types/v10"
 import {Base} from "./Base.ts"
 import {Permissions} from "./Permissions.ts"
 
@@ -64,7 +64,7 @@ export class Role extends Base {
     this.hoist = data.hoist
     this.managed = data.managed
     this.mentionable = data.mentionable
-    this.permissions = new Permissions(Number(data.permissions))
+    this.permissions = new Permissions(BigInt(data.permissions))
     this.position = data.position
 
     if ("tags" in data) {

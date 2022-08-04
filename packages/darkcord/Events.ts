@@ -6,3 +6,9 @@ export interface ClientEvents {
     MESSAGE_CREATE: [];
     GUILD_MEMBER_REMOVE: [];
 }
+
+export enum Events {
+    Warn = "WARN",
+}
+
+export {GatewayDispatchEvents as GatewayEvents} from "discord-api-types/v10"

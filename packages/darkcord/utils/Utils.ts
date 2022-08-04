@@ -1,3 +1,3 @@
-import {GatewayIntentBits} from "discord-api-types/v10.ts"
+import {GatewayIntentBits} from "discord-api-types/v10"
 
 export const DefaultIntents = GatewayIntentBits.Guilds
