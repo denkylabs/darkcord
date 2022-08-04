@@ -17,7 +17,7 @@ export interface RestEvents {
 
 export class Rest extends EventEmitter {
   requestHandler: RequestHandler
-  constructor (token: string) {
+  constructor (token?: string) {
     super()
     this.requestHandler = new RequestHandler(this, {
       token
