@@ -1,8 +1,8 @@
 import {GatewayClient} from "./GatewayClient.ts"
 import {InteractionClient} from "./InteractionClient.ts"
-import {GatewayIntentBits} from "discord-api-types/v10.ts"
-import {DefaultIntents} from "../utils/Utils.ts"
-import {parseOptions} from "../utils/Options.ts"
+import {GatewayIntentBits} from "discord-api-types/v10"
+import {verifyOptions} from "../utils/Options.ts"
+import {CacheFactoryOptions} from "../utils/CacheFactory.ts"
 
 type BuiltClient = GatewayClient | InteractionClient
 type DiscordToken = `Bot ${string}`
@@ -13,8 +13,9 @@ export enum ConnectionType {
 }
 
 export interface ClientOptions {
-    type: ConnectionType;
-    intents: GatewayIntentBits;
+    type?: ConnectionType;
+    intents?: GatewayIntentBits;
+    cacheFactory?: CacheFactoryOptions
 }
 
 export class ClientBuilder {
@@ -26,12 +27,16 @@ export class ClientBuilder {
      * Options of this client
      */
   options: ClientOptions
-  constructor(publicKey: string, options?: ClientOptions & { token: DiscordToken })
-  constructor (token: DiscordToken, options?: ClientOptions) {
+  constructor(publicKey: string, options?: ClientOptions & { token?: DiscordToken })
+  constructor (token: DiscordToken, options: ClientOptions = {}) {
     this.auth = token
-    this.options = parseOptions(options || {
-      intents: DefaultIntents
-    } as ClientOptions)
+    if (!options.cacheFactory) {
+      options.cacheFactory = {
+        GuildCache: Infinity
+      }
+    }
+
+    this.options = verifyOptions(options)
   }
   /**
      * Set connection type
@@ -43,6 +48,10 @@ export class ClientBuilder {
   }
   setIntents (intents: GatewayIntentBits) {
     this.options.intents = intents
+    return this
+  }
+  setCacheFactory (factory: CacheFactoryOptions) {
+    this.options.cacheFactory = factory
     return this
   }
   /**
