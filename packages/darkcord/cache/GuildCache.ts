@@ -1,14 +1,26 @@
-import {Cache} from "../Cache.ts"
+import {Cache, CacheFetchOptions} from "./Cache.ts"
 import {Guild} from "../structures/Guild.ts"
 
 export class GuildCache extends Cache<Guild> {
-  add (guild: Guild, replace = false) {
-    const id = guild.id.toString()
-    if (super.has(id) && !replace) {
-      return super.get(id)
+  async fetch (options: CacheFetchOptions, useCacheIfExists = false) {
+    const {client, id, api} = options
+
+    if (useCacheIfExists && this.has(id)) {
+      return this.get(id)
     }
 
-    super.set(id, guild)
-    return guild
+    const data = await client.rest.getGuild(id)
+
+    if (data !== null) {
+      if (api) {
+        return data
+      }
+
+      const b = new Guild(data, client)
+      client.cache.guilds.add(b)
+      return b
+    }
+
+    return null
   }
 }
