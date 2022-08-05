@@ -1,0 +1,10 @@
+{
+  "name": "darkcord",
+  "version": "0.1.0",
+  "description": "A NodeJS and Deno Discord library to interact with api",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/denkylabs/darkcord.git"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "rest",
+  "version": "0.1.0",
+  "description": "Library to made Api requests in darkcord",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/denkylabs/darkcord.git"
+  }
+}
