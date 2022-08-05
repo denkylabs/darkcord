@@ -9,6 +9,7 @@ export interface RequestHeaders {
     Authorization?: string;
     "User-Agent": string;
     "X-Audit-Log-Reason"?: string;
+    "Content-Type": string
 }
 
 interface RequestHandlerOptions {
@@ -43,14 +44,14 @@ export class RequestHandler {
   get (router: string) {
     return this.#request(router)
   }
-  patch (router: string, body?: BodyInit) {
-    return this.#request(router, "PATCH", body)
+  patch (router: string, body?: BodyInit, contentType?: string) {
+    return this.#request(router, "PATCH", body, contentType)
   }
-  put (router: string, body?: BodyInit) {
-    return this.#request(router, "PUT", body)
+  put (router: string, body?: BodyInit, contentType?: string) {
+    return this.#request(router, "PUT", body, contentType)
   }
-  post (router: string, body?: BodyInit) {
-    return this.#request(router, "POST", body)
+  post (router: string, body?: BodyInit, contentType?: string) {
+    return this.#request(router, "POST", body, contentType)
   }
   delete (router: string) {
     return this.#request(router, "DELETE")
@@ -63,7 +64,7 @@ export class RequestHandler {
       }, ms)
     })
   }
-  #request (router: string, method = "GET", body?: BodyInit, reason?: string): Promise<unknown | null> {
+  #request (router: string, method = "GET", body?: BodyInit, reason?: string, contentType = "application/json"): Promise<unknown | null> {
     let bucket: Bucket | undefined
     let retries = 1
     const {auth, rest} = this
@@ -74,7 +75,8 @@ export class RequestHandler {
 
     const headers = {
       Authorization: auth,
-      "User-Agent": "DiscordBot (https://github.com/denkylabs/darkcord, v0.1.0)"
+      "User-Agent": "DiscordBot (https://github.com/denkylabs/darkcord, v0.1.0)",
+      "Content-Type": contentType
     } as RequestHeaders
 
     if (reason) {
