@@ -1,6 +1,4 @@
 /* eslint-disable no-use-before-define */
-import {RestAction} from "darkcord/rest"
-
 import {
   APIApplicationCommandInteraction,
   APIApplicationCommandInteractionDataOption,
@@ -15,10 +13,13 @@ import {
   Snowflake,
   APIInteractionResponseCallbackData,
   InteractionResponseType,
-  APIMessageInteraction
+  APIMessageInteraction,
+  APIGuildMember
 } from "discord-api-types/v10"
 import {BaseClient} from "../client/BaseClient.ts"
+import {InteractionRespondRestAction} from "./actions/Interaction.ts"
 import {Base} from "./Base.ts"
+import {Guild} from "./Guild.ts"
 import {Member} from "./Member.ts"
 import {User} from "./User.ts"
 
@@ -35,22 +36,12 @@ export class Interaction extends Base {
   readonly type: AnyInteraction
   readonly token: string
   readonly version: 1
-  constructor (data: APIInteraction) {
+  constructor (data: APIInteraction, public client: BaseClient) {
     super(data.id)
     this.token = data.token
     this.type = data.type
     this.applicationId = data.application_id
     this.version = data.version
-  }
-  static get _interactionRestAction () {
-    return class extends RestAction {
-      complete () {
-        return this._complete()
-      }
-      async queue () {
-        await this._complete()
-      }
-    }
   }
   /**
      * Resolves data and return the specified interaction structure
@@ -61,7 +52,7 @@ export class Interaction extends Base {
         return new ApplicationCommandInteraction(data, client, respondFunc)
       }
       default: {
-        return new Interaction(data)
+        return new Interaction(data, client)
       }
     }
   }
@@ -92,31 +83,52 @@ export class ApplicationCommandInteractionOption {
 }
 
 export class ApplicationCommandInteraction extends Interaction {
-  #respondInteraction: RespondFunc|undefined
-  constructor (data: APIApplicationCommandInteraction, public client: BaseClient, respondFunc?: RespondFunc) {
-    super(data)
+  #respondInteraction?: RespondFunc
+  /**
+   * The guild id it was sent from
+   */
+  guildId?: string
+  /**
+   * The guild's preferred locale, if invoked in a guild
+   */
+  guildLocale?: string
+  /**
+   * The channel it was sent from
+   */
+  channelId: string
+  /**
+   * The guild object it was sent from
+   */
+  guild?: Guild|null
+  constructor (data: APIApplicationCommandInteraction, client: BaseClient, respondFunc?: RespondFunc) {
+    super(data, client)
     this.#respondInteraction = respondFunc
+    this.guildId = data.guild_id
+    this.guildLocale = data.guild_locale
+    this.channelId = data.channel_id
+
+    this.guild = this.guildId !== undefined ? client.cache.guilds.get(this.guildId) : null
   }
   reply (data: APIInteractionResponseCallbackData) {
-    let replyAction: () => Promise<unknown>
-    if (this.#respondInteraction !== undefined) {
-      const respond = this.#respondInteraction as RespondFunc
-      replyAction = () => respond(
-        new Response(JSON.stringify({
-          type: InteractionResponseType.ChannelMessageWithSource,
-          data
-        }))
-      )
-    } else {
-      replyAction = () => this.client.rest.replyInteraction(
-        this.id.toString(),
-        this.token,
-        data,
-        InteractionResponseType.ChannelMessageWithSource
-      )
-    }
+    return InteractionRespondRestAction.createAction(this, data, async (d) => {
+      if (this.#respondInteraction !== undefined) {
+        const respond = this.#respondInteraction as RespondFunc
 
-    return new Interaction._interactionRestAction(replyAction)
+        await respond(new Response(JSON.stringify({
+          type: InteractionResponseType.ChannelMessageWithSource,
+          data: d
+        })))
+      } else {
+        await this.client.rest.respondInteraction(
+          this.id,
+          this.token,
+          d,
+          InteractionResponseType.ChannelMessageWithSource
+        )
+      }
+
+      return this.client.rest.getWebhookMessage(this.id, this.token, "@original") as unknown as Promise<APIMessageInteraction>
+    })
   }
 }
 
@@ -143,11 +155,7 @@ export class ChatInputApplicationCommandInteractionData {
     this.name = data.name
     this.id = data.id
 
-    this.guildId = data.guild_id
-
-    if ("options" in data) {
-      this.options = data.options?.map(d => new ApplicationCommandInteractionOption(d))
-    }
+    this.options = data.options?.map(d => new ApplicationCommandInteractionOption(d))
   }
 }
 
@@ -210,12 +218,12 @@ export class MessageInteraction extends Base {
    * The guild member who invoked the interaction, only sent in MESSAGE_CREATE events
    */
   member: Member|null
-  constructor (data: APIMessageInteraction, client: BaseClient) {
+  constructor (data: APIMessageInteraction, client: BaseClient, guild?: Guild) {
     super(data.id)
     const {member} = data
     this.name = data.name
     this.type = data.type
     this.user = new User(data.user)
-    this.member = member !== undefined ? new Member(data.member, client) : null
+    this.member = member !== undefined && guild !== undefined ? new Member(data.member as APIGuildMember, guild as Guild, client) : null
   }
 }
