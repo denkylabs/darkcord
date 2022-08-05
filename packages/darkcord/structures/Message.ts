@@ -8,7 +8,8 @@ import {
   APIActionRowComponent,
   APIMessageActionRowComponent,
   MessageFlags as Flags,
-  APIMessageReference
+  APIMessageReference,
+  RESTPostAPIChannelMessageJSONBody
 } from "discord-api-types/v10"
 import {Base} from "./Base.ts"
 import {BaseClient} from "../client/BaseClient.ts"
@@ -142,4 +143,14 @@ export class Message extends Base {
       }
     }
   }
+}
+
+export interface MessageAttachment {
+   name: string,
+   blob: Blob,
+   description?: string
+}
+
+export interface MessagePostData extends RESTPostAPIChannelMessageJSONBody {
+   files: MessageAttachment[]
 }
