@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export * from "./AsyncBucket.ts"
-export * from "./AsyncQueue.ts"
-export * from "./RequestHandler.ts"
-export * from "./Rest.ts"
-export * from "./SequentialBucket.ts"
+export * from "./src/AsyncBucket.ts"
+export * from "./src/AsyncQueue.ts"
+export * from "./src/RequestHandler.ts"
+export * from "./src/Rest.ts"
+export * from "./src/SequentialBucket.ts"
 
 export interface RestActionQueueOptions {
   sendIn?: number;

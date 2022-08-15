@@ -1,4 +1,4 @@
-import { ApiVersion as DiscordApiVersion } from "darkcord/rest/utils/utils.ts";
+import { ApiVersion as DiscordApiVersion } from "darkcord/rest/src/utils/utils.ts";
 import { delay } from "deno/async";
 import {
   APIGatewayBotInfo, APIUnavailableGuild, GatewayCloseCodes, GatewayDispatchEvents, GatewayOpcodes, GatewayReceivePayload, GatewaySendPayload, type GatewayHelloData,
