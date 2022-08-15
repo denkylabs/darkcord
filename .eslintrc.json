@@ -57,6 +57,8 @@
         "import/no-extraneous-dependencies": "off",
         "no-await-in-loop": "off",
         "import/export": "off",
-        "@typescript-eslint/no-non-null-assertion": "off"
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "func-names": "off",
+        "import/no-relative-packages": "off"
     }
 }

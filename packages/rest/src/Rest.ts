@@ -1,4 +1,3 @@
-import { MessagePostData } from "darkcord/src/structures/Message.ts";
 import EventEmitter from "deno/events";
 import {
   APIApplication,
@@ -11,6 +10,7 @@ import {
   RESTPostAPIChannelMessageJSONBody,
   Routes
 } from "discord-api-types/v10";
+import { MessagePostData } from "../../darkcord/src/structures/Message.ts";
 import { RequestHandler } from "./RequestHandler.ts";
 
 export interface RateLimitEvent {

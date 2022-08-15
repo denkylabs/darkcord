@@ -1,0 +1,26 @@
+{
+  "name": "@darkcord/redis",
+  "version": "0.1.0",
+  "description": "Library to made Redis Cache Adapter",
+  "author": "Liy <liy@denkylabs.com>",
+  "license": "Apache-2.0",
+  "keywords": [
+    "node",
+    "redis",
+    "cache"
+  ],
+  "scripts": {
+    "lint": "eslint",
+    "lint:fix": "eslint --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/denkylabs/darkcord.git"
+  },
+  "bugs": {
+    "url": "https://github.com/denkylabs/darkcord/issues"
+  },
+  "engines": {
+    "node": ">=16.9.0"
+  }
+}

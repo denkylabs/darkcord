@@ -1,0 +1,27 @@
+{
+  "name": "@darkcord/cache",
+  "version": "0.1.0",
+  "description": "Utility cache structure used in darkcord",
+  "author": "Liy <liy@denkylabs.com>",
+  "license": "Apache-2.0",
+  "keywords": [
+    "node",
+    "cache",
+    "data", 
+    "utility"
+  ],
+  "scripts": {
+    "lint": "eslint",
+    "lint:fix": "eslint --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/denkylabs/darkcord.git"
+  },
+  "bugs": {
+    "url": "https://github.com/denkylabs/darkcord/issues"
+  },
+  "engines": {
+    "node": ">=16.9.0"
+  }
+}
