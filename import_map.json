@@ -1,9 +1,14 @@
 {
   "imports": {
-    "deno/events": "https://deno.land/x/events@v1.0.0/mod.ts",
+    "darkcord/rest": "./packages/rest/mod.ts",
+    "darkcord/rest/": "./packages/rest/",
+    "darkcord/cache": "./packages/cache/mod.ts",
     "deno/async": "https://deno.land/std@0.150.0/async/mod.ts",
+    "deno/events": "https://deno.land/x/events@v1.0.0/mod.ts",
+    "denoflate": "https://deno.land/x/denoflate@1.2.1/mod.ts",
     "discord-api-types/v10": "https://deno.land/x/discord_api_types@0.37.0/v10.ts",
-    "tweetnacl": "https://deno.land/x/tweetnacl_deno_fix@1.1.2/src/nacl.ts",
-    "darkcord/rest": "./packages/rest/mod.ts"
+    "ed25519": "./packages/ed25519/mod.js",
+    "redis": "https://deno.land/x/redis@v0.26.0/mod.ts",
+    "zlib": "https://unpkg.com/@evan/wasm@0.0.94/target/zlib/deno.js"
   }
 }
