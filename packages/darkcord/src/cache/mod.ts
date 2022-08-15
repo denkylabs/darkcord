@@ -6,4 +6,3 @@ export * from "./MemberCache.ts";
 export * from "./ReactionCache.ts";
 export * from "./StickerCache.ts";
 export * from "./UserCache.ts";
-

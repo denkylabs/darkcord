@@ -11,32 +11,32 @@ import { Permissions } from "./Permissions.ts";
 
 export class Guild extends Base {
   /**
-     * Guild name (2-100 characters, excluding trailing and leading whitespace)
-     */
+   * Guild name (2-100 characters, excluding trailing and leading whitespace)
+   */
   readonly name: string;
   /**
-     * Icon hash
-     * @See https://discord.com/developers/docs/reference#image-formatting
-     */
+   * Icon hash
+   * @See https://discord.com/developers/docs/reference#image-formatting
+   */
   readonly icon?: string | null;
   /**
-     * Icon hash, returned when in the template object
-     * @See https://discord.com/developers/docs/reference#image-formatting
-     */
+   * Icon hash, returned when in the template object
+   * @See https://discord.com/developers/docs/reference#image-formatting
+   */
   readonly iconHash?: string | null;
   /**
-     * Splash hash
-     * @See https://discord.com/developers/docs/reference#image-formattin
-     */
+   * Splash hash
+   * @See https://discord.com/developers/docs/reference#image-formattin
+   */
   readonly splash?: string | null;
   /**
-     * Discovery splash hash; only present for guilds with the “DISCOVERABLE” feature
-     * @See https://discord.com/developers/docs/reference#image-formatting
-     */
+   * Discovery splash hash; only present for guilds with the “DISCOVERABLE” feature
+   * @See https://discord.com/developers/docs/reference#image-formatting
+   */
   readonly discoverySplash?: string | null;
   /**
-     * ID of owner
-     */
+   * ID of owner
+   */
   readonly ownerId: Snowflake;
   /**
    * ID of afk channel
@@ -64,27 +64,42 @@ export class Guild extends Base {
   readonly stickers: StickerCache;
   readonly channels: ChannelCacheManager;
   readonly emojis: EmojiCache;
-  constructor (public data: APIGuild, public client: BaseClient) {
+
+  constructor(public data: APIGuild, public client: BaseClient) {
     super(data.id);
 
     this.name = data.name;
+
     this.icon = data.icon;
+
     this.iconHash = data.icon_hash;
+
     this.splash = data.splash;
+
     this.discoverySplash = data.discovery_splash;
+
     this.ownerId = data.owner_id;
+
     this.afkChannelId = data.afk_channel_id;
+
     this.afkTimeout = data.afk_timeout;
+
     this.banner = data.banner;
+
     this.description = data.description;
+
     this.roles = client.cache.factory.makeGuildRolesCache();
+
     this.members = client.cache.factory.makeMembersCache();
+
     this.stickers = client.cache.factory.makeStickersCache();
+
     this.channels = client.cache.factory.makeChannelsCacheManager();
+
     this.emojis = client.cache.factory.makeEmojiCache();
   }
 
-  async permissionsOf (memberId: Snowflake | Member) {
+  async permissionsOf(memberId: Snowflake | Member) {
     const member: Member | undefined = memberId instanceof Member ? memberId : await this.members.get(memberId);
 
     if (!member) {
@@ -106,7 +121,7 @@ export class Guild extends Base {
       return new Permissions(Permissions.All);
     }
 
-    for (const _role of await member.roles.keys()) {
+    for await (const _role of await member.roles.keys()) {
       const role = await this.roles.get(_role);
 
       if (role === undefined) {

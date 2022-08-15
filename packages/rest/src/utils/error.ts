@@ -1,5 +1,5 @@
 export class DiscordAPIError extends Error {
-  constructor (public router: string, public method: string, public code: number, errors: Record<string, unknown>) {
+  constructor(public router: string, public method: string, public code: number, errors: Record<string, unknown>) {
     super();
 
     this.name = "DiscordAPIError";
@@ -15,13 +15,7 @@ export class DiscordAPIError extends Error {
 }
 
 export class RequestError extends Error {
-  constructor (
-    public router: string,
-    public method: string,
-    public message: string,
-    public name: string,
-    public code: number
-  ) {
+  constructor(public router: string, public method: string, public message: string, public name: string, public code: number) {
     super();
     this.name = "RequestError";
   }

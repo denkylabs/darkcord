@@ -4,8 +4,15 @@ import {
   APIApplicationCommandInteractionDataOption,
   APIApplicationCommandOption,
   APIApplicationCommandSubcommandOption,
-  APIChatInputApplicationCommandInteractionData, APIGuildMember, APIInteraction, APIInteractionResponseCallbackData, APIMessageInteraction, ApplicationCommandOptionType,
-  ApplicationCommandType, InteractionResponseType, InteractionType,
+  APIChatInputApplicationCommandInteractionData,
+  APIGuildMember,
+  APIInteraction,
+  APIInteractionResponseCallbackData,
+  APIMessageInteraction,
+  ApplicationCommandOptionType,
+  ApplicationCommandType,
+  InteractionResponseType,
+  InteractionType,
   LocalizationMap,
   Snowflake
 } from "discord-api-types/v10";
@@ -17,31 +24,32 @@ import { Guild } from "./Guild.ts";
 import { Member } from "./Member.ts";
 import { User } from "./User.ts";
 
-type AnyInteraction = InteractionType.Ping |
-    InteractionType.ApplicationCommand |
-    InteractionType.MessageComponent |
-    InteractionType.ApplicationCommandAutocomplete |
-    InteractionType.ModalSubmit
+type AnyInteraction = InteractionType.Ping | InteractionType.ApplicationCommand | InteractionType.MessageComponent | InteractionType.ApplicationCommandAutocomplete | InteractionType.ModalSubmit;
 
-type RespondFunc = (r: Response | Promise<Response>) => Promise<void>
+type RespondFunc = (r: Response | Promise<Response>) => Promise<void>;
 
 export class Interaction extends Base {
   readonly applicationId: Snowflake;
   readonly type: AnyInteraction;
   readonly token: string;
   readonly version: 1;
-  constructor (data: APIInteraction, public client: BaseClient) {
+
+  constructor(data: APIInteraction, public client: BaseClient) {
     super(data.id);
+
     this.token = data.token;
+
     this.type = data.type;
+
     this.applicationId = data.application_id;
+
     this.version = data.version;
   }
 
   /**
-     * Resolves data and return the specified interaction structure
-     */
-  static from (data: APIInteraction, client: BaseClient, respondFunc?: RespondFunc) {
+   * Resolves data and return the specified interaction structure
+   */
+  static from(data: APIInteraction, client: BaseClient, respondFunc?: RespondFunc) {
     switch (data.type) {
       case InteractionType.ApplicationCommand: {
         return new ApplicationCommandInteraction(data, client, respondFunc);
@@ -53,25 +61,25 @@ export class Interaction extends Base {
   }
 }
 
-type AnyOptionType = ApplicationCommandOptionType.Boolean |
-    ApplicationCommandOptionType.Subcommand |
-    ApplicationCommandOptionType.SubcommandGroup |
-    ApplicationCommandOptionType.String |
-    ApplicationCommandOptionType.Integer |
-    ApplicationCommandOptionType.User |
-    ApplicationCommandOptionType.Channel |
-    ApplicationCommandOptionType.Role |
-    ApplicationCommandOptionType.Mentionable |
-    ApplicationCommandOptionType.Number |
-    ApplicationCommandOptionType.Attachment
+type AnyOptionType =
+  | ApplicationCommandOptionType.Boolean
+  | ApplicationCommandOptionType.Subcommand
+  | ApplicationCommandOptionType.SubcommandGroup
+  | ApplicationCommandOptionType.String
+  | ApplicationCommandOptionType.Integer
+  | ApplicationCommandOptionType.User
+  | ApplicationCommandOptionType.Channel
+  | ApplicationCommandOptionType.Role
+  | ApplicationCommandOptionType.Mentionable
+  | ApplicationCommandOptionType.Number
+  | ApplicationCommandOptionType.Attachment;
 
-export type AnyOption = ApplicationCommandOption |
-    ApplicationSubCommandOption
+export type AnyOption = ApplicationCommandOption | ApplicationSubCommandOption;
 
 export class ApplicationCommandInteractionOption {
   readonly name: string;
   readonly type: AnyOptionType;
-  constructor (data: APIApplicationCommandInteractionDataOption) {
+  constructor(data: APIApplicationCommandInteractionDataOption) {
     this.name = data.name;
     this.type = data.type;
   }
@@ -94,8 +102,8 @@ export class ApplicationCommandInteraction extends Interaction {
   /**
    * The guild object it was sent from
    */
-  guild?: Guild|null;
-  constructor (data: APIApplicationCommandInteraction, client: BaseClient, respondFunc?: RespondFunc) {
+  guild?: Guild | null;
+  constructor(data: APIApplicationCommandInteraction, client: BaseClient, respondFunc?: RespondFunc) {
     super(data, client);
     this.#respondInteraction = respondFunc;
     this.guildId = data.guild_id;
@@ -103,22 +111,21 @@ export class ApplicationCommandInteraction extends Interaction {
     this.channelId = data.channel_id;
   }
 
-  reply (data: APIInteractionResponseCallbackData) {
-    const action = InteractionRespondRestAction.createAction(this, data, async (d) => {
+  reply(data: APIInteractionResponseCallbackData) {
+    const action = InteractionRespondRestAction.createAction(this, data, async d => {
       if (this.#respondInteraction !== undefined) {
         const respond = this.#respondInteraction as RespondFunc;
 
-        await respond(new Response(JSON.stringify({
-          type: InteractionResponseType.ChannelMessageWithSource,
-          data: d
-        })));
-      } else {
-        await this.client.rest.respondInteraction(
-          this.id,
-          this.token,
-          d,
-          InteractionResponseType.ChannelMessageWithSource
+        await respond(
+          new Response(
+            JSON.stringify({
+              type: InteractionResponseType.ChannelMessageWithSource,
+              data: d
+            })
+          )
         );
+      } else {
+        await this.client.rest.respondInteraction(this.id, this.token, d, InteractionResponseType.ChannelMessageWithSource);
       }
 
       return this.client.rest.getWebhookMessage(this.client.application?.id as string, this.token, "@original") as unknown as Promise<APIMessageInteraction>;
@@ -135,23 +142,23 @@ export class ApplicationCommandInteraction extends Interaction {
 
 export class ChatInputApplicationCommandInteractionData {
   /**
-     * The type of the invoked command
-     */
+   * The type of the invoked command
+   */
   readonly type: ApplicationCommandType.ChatInput;
   /**
-     * The name of the invoked command
-     */
+   * The name of the invoked command
+   */
   readonly name: string;
   /**
-     * The ID of the invoked command
-     */
+   * The ID of the invoked command
+   */
   readonly id: Snowflake;
   /**
-     * The guild ID of the invoked command
-     */
+   * The guild ID of the invoked command
+   */
   readonly guildId?: Snowflake;
   readonly options?: ApplicationCommandInteractionOption[];
-  constructor (data: APIChatInputApplicationCommandInteractionData) {
+  constructor(data: APIChatInputApplicationCommandInteractionData) {
     this.type = data.type;
     this.name = data.name;
     this.id = data.id;
@@ -167,7 +174,7 @@ export class ApplicationCommandOption {
   readonly description: string;
   readonly descriptionLocalizations?: LocalizationMap | null;
   readonly required?: boolean;
-  constructor (data: APIApplicationCommandOption) {
+  constructor(data: APIApplicationCommandOption) {
     this.type = data.type;
     this.name = data.name;
     this.nameLocalizations = data.name_localizations;
@@ -176,7 +183,7 @@ export class ApplicationCommandOption {
     this.required = data.required;
   }
 
-  static from (data: APIApplicationCommandOption) {
+  static from(data: APIApplicationCommandOption) {
     switch (data.type) {
       case ApplicationCommandOptionType.Subcommand: {
         return new ApplicationSubCommandOption(data);
@@ -194,7 +201,7 @@ export class ApplicationCommandOption {
 export class ApplicationSubCommandOption<Group = false> extends ApplicationCommandOption {
   // eslint-disable-next-line no-use-before-define
   readonly options?: Group extends true ? ApplicationSubCommandOption[] : AnyOption[];
-  constructor (data: APIApplicationCommandSubcommandOption) {
+  constructor(data: APIApplicationCommandSubcommandOption) {
     super(data);
 
     if ("options" in data) {
@@ -219,8 +226,8 @@ export class MessageInteraction extends Base {
   /**
    * The guild member who invoked the interaction, only sent in MESSAGE_CREATE events
    */
-  member: Member|null;
-  constructor (public data: APIMessageInteraction, public client: BaseClient, public guild?: Guild) {
+  member: Member | null;
+  constructor(public data: APIMessageInteraction, public client: BaseClient, public guild?: Guild) {
     super(data.id);
     const { member } = data;
     this.name = data.name;

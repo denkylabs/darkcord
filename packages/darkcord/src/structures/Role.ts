@@ -4,18 +4,19 @@ import { Permissions } from "./Permissions.ts";
 
 export class RoleTags {
   /**
-     * The id of the bot this role belongs to
-     */
+   * The id of the bot this role belongs to
+   */
   botId?: Snowflake;
   /**
-     * The id of the integration this role belongs to
-     */
+   * The id of the integration this role belongs to
+   */
   integrationId?: Snowflake;
   /**
-     * Whether this is the guild's premium subscriber role
-     */
+   * Whether this is the guild's premium subscriber role
+   */
   premiumSubscriber?: null;
-  constructor (data: APIRoleTags) {
+
+  constructor(data: APIRoleTags) {
     this.botId = data.bot_id;
     this.integrationId = data.integration_id;
     this.premiumSubscriber = data.premium_subscriber;
@@ -24,39 +25,39 @@ export class RoleTags {
 
 export class Role extends Base {
   /**
-     * Integer representation of hexadecimal color code
-     */
+   * Integer representation of hexadecimal color code
+   */
   readonly color: number;
   /**
-     * Role name
-     */
+   * Role name
+   */
   readonly name: string;
   /**
-     * If this role is pinned in the user listing
-     */
+   * If this role is pinned in the user listing
+   */
   readonly hoist: boolean;
   /**
-     * Whether this role is managed by an integration
-     */
+   * Whether this role is managed by an integration
+   */
   readonly managed: boolean;
   /**
-     * Whether this role is mentionable
-     */
+   * Whether this role is mentionable
+   */
   readonly mentionable: boolean;
   /**
-     * Position of this role
-     */
+   * Position of this role
+   */
   readonly position: number;
   /**
-     * Permission bit set
-     * @See https://en.wikipedia.org/wiki/Bit_field
-     */
+   * Permission bit set
+   * @See https://en.wikipedia.org/wiki/Bit_field
+   */
   readonly permissions: Permissions;
   /**
-     * The tags this role has
-     */
+   * The tags this role has
+   */
   readonly tags?: RoleTags;
-  constructor (data: APIRole) {
+  constructor(data: APIRole) {
     super(data.id);
 
     this.color = data.color;

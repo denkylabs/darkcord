@@ -18,11 +18,14 @@ export interface ClientCache<Options = false> {
 
 export abstract class BaseClient extends EventEmitter {
   rest: Rest;
+
   cache: ClientCache;
+
   user?: User;
+
   application?: APIApplication;
 
-  protected constructor (cache: ClientCache<true>, public _requestOptions: BuilderRequestOptions) {
+  protected constructor(cache: ClientCache<true>, public _requestOptions: BuilderRequestOptions) {
     super();
 
     this.rest = new Rest();
@@ -40,11 +43,11 @@ export abstract class BaseClient extends EventEmitter {
   }
 }
 export declare interface BaseClient {
-  on<E extends keyof (RawClientEvents & ClientEvents)> (event: E, listener: (...args: (RawClientEvents & ClientEvents)[E]) => unknown): this
-  on<E extends keyof RawClientEvents> (event: E, listener: (...args: RawClientEvents[E]) => unknown): this
-  on<E extends keyof ClientEvents>(event: E, listener: (...args: ClientEvents[E]) => unknown): this
+  on<E extends keyof (RawClientEvents & ClientEvents)>(event: E, listener: (...args: (RawClientEvents & ClientEvents)[E]) => unknown): this;
+  on<E extends keyof RawClientEvents>(event: E, listener: (...args: RawClientEvents[E]) => unknown): this;
+  on<E extends keyof ClientEvents>(event: E, listener: (...args: ClientEvents[E]) => unknown): this;
 
-  emit<E extends keyof (RawClientEvents & ClientEvents)> (event: E, ...args: (RawClientEvents & ClientEvents)[E]): boolean
-  emit<E extends keyof RawClientEvents> (event: E, ...args: RawClientEvents[E]): boolean
-  emit<E extends keyof ClientEvents> (event: E, ...args: ClientEvents[E]): boolean
+  emit<E extends keyof (RawClientEvents & ClientEvents)>(event: E, ...args: (RawClientEvents & ClientEvents)[E]): boolean;
+  emit<E extends keyof RawClientEvents>(event: E, ...args: RawClientEvents[E]): boolean;
+  emit<E extends keyof ClientEvents>(event: E, ...args: ClientEvents[E]): boolean;
 }

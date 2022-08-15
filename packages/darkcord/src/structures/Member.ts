@@ -1,6 +1,7 @@
 import { APIGuildMember, PartialAPIMessageInteractionGuildMember } from "discord-api-types/v10";
 import type { RoleCache } from "../cache/RoleCache.ts";
 import { Guild } from "./Guild.ts";
+import { Role } from "./Role.ts";
 import { User } from "./User.ts";
 
 export class Member {
@@ -42,28 +43,38 @@ export class Member {
    * **This field won't be included in the member object attached to `MESSAGE_CREATE` and `MESSAGE_UPDATE` gateway events.**
    */
   readonly user: User | null;
-  constructor (data: APIGuildMember | PartialAPIMessageInteractionGuildMember, public readonly guild: Guild) {
+
+  constructor(data: APIGuildMember | PartialAPIMessageInteractionGuildMember, public readonly guild: Guild) {
     const { communication_disabled_until: communicationDisabledUntil, user } = data as APIGuildMember;
+
     this.avatar = data.avatar;
+
     this.nickname = data.nick;
+
     this.deafened = data.deaf;
+
     this.mute = data.mute;
+
     this.roles = guild.client.cache.factory.makeMemberRolesCache();
+
     this.communicationDisabledUntil = communicationDisabledUntil !== undefined ? Date.parse(communicationDisabledUntil as string) : null;
+
     this.pending = data.pending ?? false;
+
     this.joinedAt = Date.parse(data.joined_at);
+
     this.user = user !== undefined ? new User(user, guild.client) : null;
 
     for (const _role of data.roles) {
       const role = guild.roles.get(_role);
 
       if (role !== undefined) {
-        this.roles.add(role);
+        this.roles.add(role as Role);
       }
     }
   }
 
-  get permissions () {
+  get permissions() {
     return Object.freeze(this.guild.permissionsOf(this.user?.id as string));
   }
 }

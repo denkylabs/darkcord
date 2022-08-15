@@ -5,35 +5,36 @@ import { SequentialBucket } from "./SequentialBucket.ts";
 import { DiscordAPIError, RequestError } from "./utils/error.ts";
 import { parse } from "./utils/parse.ts";
 import { ApiRoute, ApiVersion, DiscordUrl } from "./utils/utils.ts";
+
 export interface RequestHeaders {
-    Authorization?: string;
-    "User-Agent": string;
-    "X-Audit-Log-Reason"?: string;
-    "Content-Type": string
+  Authorization?: string;
+  "User-Agent": string;
+  "X-Audit-Log-Reason"?: string;
+  "Content-Type": string;
 }
 
 interface RequestHandlerOptions {
-  token?: string
-  apiVersion?: string
-  maxRetry?: number
+  token?: string;
+  apiVersion?: string;
+  maxRetry?: number;
 }
 
-function getAPIOffset (serverDate: Date) {
+function getAPIOffset(serverDate: Date) {
   return serverDate.getTime() - Date.now();
 }
 
-function calculateReset (reset: string, serverDate: Date) {
+function calculateReset(reset: string, serverDate: Date) {
   return new Date(Number(reset) * 1000).getTime() - getAPIOffset(serverDate);
 }
 
 export interface RequestOptions {
-  method?: string
+  method?: string;
   reason?: string;
-  contentType?: string
+  contentType?: string;
   headers?: {
-    [x: string]: string
+    [x: string]: string;
   };
-  body?: BodyInit
+  body?: BodyInit;
 }
 
 export class RequestHandler {
@@ -42,39 +43,39 @@ export class RequestHandler {
   #maxRetry: number;
   #buckets: SequentialBucket;
 
-  constructor (public rest: Rest, options: RequestHandlerOptions = {}) {
+  constructor(public rest: Rest, options: RequestHandlerOptions = {}) {
     this.auth = options.token;
     this.#apiRoute = DiscordUrl + ApiRoute + (options.apiVersion || ApiVersion);
     this.#maxRetry = options.maxRetry || 5;
     this.#buckets = new SequentialBucket(rest);
   }
 
-  setToken (token: string) {
+  setToken(token: string) {
     this.auth = token;
     return this;
   }
 
-  get (router: string) {
+  get(router: string) {
     return this.#request(router);
   }
 
-  patch (router: string, body?: BodyInit, contentType?: string) {
+  patch(router: string, body?: BodyInit, contentType?: string) {
     return this.#request(router, "PATCH", { body, contentType });
   }
 
-  put (router: string, body?: BodyInit, contentType?: string) {
+  put(router: string, body?: BodyInit, contentType?: string) {
     return this.#request(router, "PUT", { body, contentType });
   }
 
-  post (router: string, body?: BodyInit, contentType?: string) {
+  post(router: string, body?: BodyInit, contentType?: string) {
     return this.#request(router, "POST", { body, contentType });
   }
 
-  delete (router: string) {
+  delete(router: string) {
     return this.#request(router, "DELETE");
   }
 
-  #globalDelayFor (ms: number) {
+  #globalDelayFor(ms: number) {
     return new Promise<void>(resolve => {
       this.#buckets.setTimeout(() => {
         this.#buckets.globalDelay = null;
@@ -83,7 +84,7 @@ export class RequestHandler {
     });
   }
 
-  #request (router: string, method = "GET", options: RequestOptions = {}): Promise<unknown | null> {
+  #request(router: string, method = "GET", options: RequestOptions = {}): Promise<unknown | null> {
     const { body, contentType, headers: customHeaders, reason } = options;
 
     let retries = 1;
@@ -102,7 +103,7 @@ export class RequestHandler {
 
     if (contentType !== undefined) {
       headers["Content-Type"] = contentType as string;
-    } else if (contentType === undefined && (body instanceof FormData) === false) {
+    } else if (contentType === undefined && body instanceof FormData === false) {
       headers["Content-Type"] = "application/json";
     }
 
@@ -110,7 +111,7 @@ export class RequestHandler {
       headers["X-Audit-Log-Reason"] = encodeURIComponent(reason);
     }
 
-    function emitRateLimit (global: boolean, timeout: number, limit: number) {
+    function emitRateLimit(global: boolean, timeout: number, limit: number) {
       rest.emit("rateLimit", {
         global,
         timeout,
@@ -120,7 +121,7 @@ export class RequestHandler {
       });
     }
 
-    async function request (): Promise<unknown> {
+    async function request(): Promise<unknown> {
       const controller = new AbortController();
       const timer = setTimeout(() => {
         controller.abort();
@@ -128,7 +129,9 @@ export class RequestHandler {
 
       while (buckets.limited || bucket.limited) {
         const isGlobal = buckets.limited;
-        let limit, timeout, delayPromise;
+        let limit;
+        let timeout;
+        let delayPromise;
 
         if (isGlobal) {
           limit = buckets.globalLimit;
@@ -170,8 +173,7 @@ export class RequestHandler {
       retryAfter = retryAfter ? Number(retryAfter) * 1000 : -1;
 
       if (router.includes("reactions") === true) {
-        reset =
-          serverDate.getTime() - getAPIOffset(serverDate) + 250;
+        reset = serverDate.getTime() - getAPIOffset(serverDate) + 250;
       }
 
       bucket.limit = limit;
@@ -210,21 +212,10 @@ export class RequestHandler {
           data = await parse(res);
         } catch (err) {
           const _ = err as RequestError;
-          throw new RequestError(
-            router,
-            method,
-            _.message,
-            _.constructor.name,
-            _.code
-          );
+          throw new RequestError(router, method, _.message, _.constructor.name, _.code);
         }
 
-        throw new DiscordAPIError(
-          router,
-          method,
-          data?.code,
-          data?.errors ?? Object.entries(data).map(([key, message]) => `${key}: ${message}`)
-        );
+        throw new DiscordAPIError(router, method, data?.code, data?.errors ?? Object.entries(data).map(([key, message]) => `${key}: ${message}`));
       }
 
       if (res.status >= 500 && res.status < 600) {

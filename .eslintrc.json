@@ -24,26 +24,39 @@
         "@typescript-eslint"
     ],
     "rules": {
-        "quotes": ["error", "double"],
-        "no-spaced-func": "error",
-        "semi": ["error", "always"],
-        "require-await": "error",
-        "import/no-unresolved": "off",
-        "import/extensions": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unused-vars": "error",
+        "class-methods-use-this": "off",
+        "default-case": "off",
+        "default-param-last": "off",
         "import/prefer-default-export": "off",
+        "quotes": ["error", "double"],
+        "no-shadow": "off",
+        "max-classes-per-file": "off",
+        "import/extensions": "off",
+        "import/no-unresolved": "off",
         "no-underscore-dangle": "off",
-        "no-unused-vars": "off",
-        "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "([th]is|[public ]|[private ])" }],
-        "no-param-reassign": "off",
-        "no-useless-call": "off",
-        "no-useless-constructor": "off",
-        "@typescript-eslint/no-useless-constructor": "error",
-        "prettier/prettier": [
+        "camelcase": "off",
+        "lines-between-class-members": [
             "error",
-            {},
+            "always",
             {
-                "usePrettierrc": true
+                "exceptAfterSingleLine": true
             }
-        ]
+        ],
+        "no-param-reassign": "off",
+        "no-bitwise": "off",
+        "no-restricted-syntax": "off",
+        "no-restricted-globals": "off",
+        "no-continue": "off",
+        "no-plusplus": "off",
+        "no-use-before-define": "off",
+        "@typescript-eslint/no-use-before-define": "off",
+        "require-await": "error",
+        "@typescript-eslint/require-await": "error",
+        "import/no-extraneous-dependencies": "off",
+        "no-await-in-loop": "off",
+        "import/export": "off",
+        "@typescript-eslint/no-non-null-assertion": "off"
     }
 }

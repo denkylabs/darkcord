@@ -1,5 +1,5 @@
-import { CacheAdapter } from "darkcord/cache"
-import * as redis from "redis"
+import { CacheAdapter } from "darkcord/cache";
+import * as redis from "redis";
 
 /**
  * @example
@@ -27,90 +27,91 @@ import * as redis from "redis"
  * ```
  */
 export class RedisCacheAdapter<T> implements CacheAdapter<T> {
-  #instance!: redis.Redis
-  async connect (options: redis.RedisConnectOptions) {
-    this.#instance = await redis.connect(options)
-    return this.instance
+  #instance!: redis.Redis;
+
+  async connect(options: redis.RedisConnectOptions) {
+    this.#instance = await redis.connect(options);
+    return this.instance;
   }
 
-  async set (key: string, value: T) {
-    await this.instance.set(key, JSON.stringify(value))
-    return this as unknown as CacheAdapter<T>
+  async set(key: string, value: T) {
+    await this.instance.set(key, JSON.stringify(value));
+    return this as unknown as CacheAdapter<T>;
   }
 
-  async get (key: string) {
-    const result = await this.instance.hget("darkcord", key)
+  async get(key: string) {
+    const result = await this.instance.hget("darkcord", key);
 
     if (result !== undefined) {
-      return JSON.parse(result)
+      return JSON.parse(result);
     }
 
-    return null
+    return null;
   }
 
-  async has (key: string) {
-    return !!await this.instance.exists(key)
+  async has(key: string) {
+    return !!(await this.instance.exists(key));
   }
 
-  async entries () {
-    const arr = await this.instance.hgetall("darkcord")
-    const result = arr.map(async (value) => [value, this.#resolveValue(await this.instance.hget("darkcord", value))])
-    return (async function * () {
+  async entries() {
+    const arr = await this.instance.hgetall("darkcord");
+    const result = arr.map(async value => [value, this.#resolveValue(await this.instance.hget("darkcord", value))]);
+    return (async function* () {
       for await (const [key, value] of result) {
-        yield [key, value]
+        yield [key, value];
       }
-    })() as unknown as Promise<IterableIterator<[string, T]>>
+    })() as unknown as Promise<IterableIterator<[string, T]>>;
   }
 
-  get size () {
-    return this._getSize()
+  get size() {
+    return this._getSize();
   }
 
-  _getSize () {
-    return this.instance.hlen("darkcord")
+  _getSize() {
+    return this.instance.hlen("darkcord");
   }
 
-  delete (key: string) {
-    return !!this.instance.hdel("darkcord", key)
+  delete(key: string) {
+    return !!this.instance.hdel("darkcord", key);
   }
 
-  async clear () {
-    await this.instance.flushall()
+  async clear() {
+    await this.instance.flushall();
   }
 
-  async values () {
-    const arr = await this.instance.hgetall("darkcord")
-    const result = arr.map(async (value) => this.#resolveValue(await this.instance.hget("darkcord", value)))
-    return (async function * () {
+  async values() {
+    const arr = await this.instance.hgetall("darkcord");
+    const result = arr.map(async value => this.#resolveValue(await this.instance.hget("darkcord", value)));
+    return (async function* () {
       for await (const value of result) {
-        yield value
+        yield value;
       }
-    })() as unknown as Promise<IterableIterator<T>>
+    })() as unknown as Promise<IterableIterator<T>>;
   }
 
-  async keys () {
-    const result = await this.instance.hgetall("darkcord")
-    return (async function * () {
+  async keys() {
+    const result = await this.instance.hgetall("darkcord");
+    return (async function* () {
       for await (const value of result) {
-        yield value
+        yield value;
       }
-    })() as unknown as Promise<IterableIterator<string>>
+    })() as unknown as Promise<IterableIterator<string>>;
   }
 
-  #resolveValue (value: redis.Bulk) {
+  #resolveValue(value: redis.Bulk) {
     try {
-      const json = JSON.parse(value as string)
-      return json
+      const json = JSON.parse(value as string);
+      return json;
     } catch {
-      return value
+      return value;
     }
   }
 
-  get instance () {
+  get instance() {
     if (this.#instance === undefined) {
-      throw new Error("Missing redis connection, please connect first.")
+      throw new Error("Missing redis connection, please connect first.");
     }
 
-    return this.#instance
+    return this.#instance;
   }
 }

@@ -4,7 +4,7 @@ import { Snowflake } from "./Snowflake.ts";
 export class Base {
   createdAt: number;
 
-  constructor (public id: snowflake) {
+  constructor(public id: snowflake) {
     this.createdAt = Snowflake.getCreatedAt(id);
   }
 }

@@ -6,31 +6,29 @@ import { BaseClient } from "./BaseClient.ts";
 import type { BuilderRequestOptions } from "./ClientBuilder.ts";
 
 export class InteractionClient extends BaseClient {
-  constructor (
-    public publicKey: string,
-    token?: string,
-    cacheFactoryOptions?: CacheFactoryOptions,
-    _requestOptions?: BuilderRequestOptions
-  ) {
-    super({
-      factory: cacheFactoryOptions ?? {
-        GuildCache: Infinity
+  constructor(public publicKey: string, token?: string, cacheFactoryOptions?: CacheFactoryOptions, _requestOptions?: BuilderRequestOptions) {
+    super(
+      {
+        factory: cacheFactoryOptions ?? {
+          GuildCache: Infinity
+        },
+        guilds: undefined,
+        users: undefined,
+        channels: undefined
       },
-      guilds: undefined,
-      users: undefined,
-      channels: undefined
-    }, _requestOptions ?? {
-      queue: {
-        auto: false
+      _requestOptions ?? {
+        queue: {
+          auto: false
+        }
       }
-    });
+    );
 
     if (token !== undefined) {
       super.rest.requestHandler.setToken(token);
     }
   }
 
-  async connect (port: number) {
+  async connect(port: number) {
     // Creating http server
     const server = Deno.listen({ port });
     this.application = await this.rest.getCurrentApplication();
@@ -40,7 +38,7 @@ export class InteractionClient extends BaseClient {
     }
   }
 
-  async #serveHttp (conn: Deno.Conn) {
+  async #serveHttp(conn: Deno.Conn) {
     const httpConn = Deno.serveHttp(conn);
     const decoder = new TextDecoder();
 
@@ -56,9 +54,13 @@ export class InteractionClient extends BaseClient {
       }
 
       if (body.type === InteractionType.Ping) {
-        await event.respondWith(new Response(JSON.stringify({
-          type: InteractionResponseType.Pong
-        })));
+        await event.respondWith(
+          new Response(
+            JSON.stringify({
+              type: InteractionResponseType.Pong
+            })
+          )
+        );
         continue;
       }
 
@@ -66,13 +68,13 @@ export class InteractionClient extends BaseClient {
     }
   }
 
-  #toHexUint8Array (value: string) {
+  #toHexUint8Array(value: string) {
     const matches = value.match(/.{1,2}/g);
     const hex = matches?.map((byte: string) => parseInt(byte, 16));
     return new Uint8Array(hex as number[]);
   }
 
-  #verifyKey (rawBody: ArrayBuffer, signature: string, timestamp: string) {
+  #verifyKey(rawBody: ArrayBuffer, signature: string, timestamp: string) {
     try {
       const encoder = new TextEncoder();
       const bodyData = new Uint8Array(rawBody);

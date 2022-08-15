@@ -1,16 +1,24 @@
 import EventEmitter from "deno/events";
 import {
-  APIApplication, APIGatewayBotInfo, APIGuild, APIInteractionResponseCallbackData, APIMessage, APIUser, InteractionResponseType, RESTPostAPIChannelMessageJSONBody, Routes
+  APIApplication,
+  APIGatewayBotInfo,
+  APIGuild,
+  APIInteractionResponseCallbackData,
+  APIMessage,
+  APIUser,
+  InteractionResponseType,
+  RESTPostAPIChannelMessageJSONBody,
+  Routes
 } from "discord-api-types/v10";
-import { MessagePostData } from "../../darkcord/src/structures/Message.ts";
+import { MessagePostData } from "darkcord/src/structures/Message.ts";
 import { RequestHandler } from "./RequestHandler.ts";
 
 export interface RateLimitEvent {
-    global: boolean;
-    timeout: number;
-    limit: number;
-    router: string;
-    method: string;
+  global: boolean;
+  timeout: number;
+  limit: number;
+  router: string;
+  method: string;
 }
 
 export interface RestEvents {
@@ -22,11 +30,11 @@ export interface RestEvents {
 export class Rest extends EventEmitter {
   requestHandler: RequestHandler;
   get: (router: string) => Promise<unknown>;
-  post: (router: string, body?: BodyInit|undefined, contentType?: string|undefined) => Promise<unknown>;
-  patch: (router: string, body?: BodyInit|undefined, contentType?: string|undefined) => Promise<unknown>;
+  post: (router: string, body?: BodyInit | undefined, contentType?: string | undefined) => Promise<unknown>;
+  patch: (router: string, body?: BodyInit | undefined, contentType?: string | undefined) => Promise<unknown>;
   delete: (router: string) => Promise<unknown>;
-  put: (router: string, body?: BodyInit|undefined, contentType?: string|undefined) => Promise<unknown>;
-  constructor (token?: string, public requestTimeout = 15_000) {
+  put: (router: string, body?: BodyInit | undefined, contentType?: string | undefined) => Promise<unknown>;
+  constructor(token?: string, public requestTimeout = 15_000) {
     super();
     this.requestHandler = new RequestHandler(this, {
       token
@@ -40,15 +48,15 @@ export class Rest extends EventEmitter {
   }
 
   /**
-     * Post a message to a guild text or DM channel.
-     * @returns A message object.
-     * @fires A Message Create Gateway event.
-     * @see message [formatting](https://discord.com/developers/docs/reference#message-formatting) for more information on how to properly format messages.
-     * @param channelId The id of channel to create message
-     */
-  createMessage (channelId: string, data: RESTPostAPIChannelMessageJSONBody, files?: {name: string, description?: string, blob: Blob}[]): Promise<APIMessage> {
-    let d: FormData | string,
-      contentType: string | undefined;
+   * Post a message to a guild text or DM channel.
+   * @returns A message object.
+   * @fires A Message Create Gateway event.
+   * @see message [formatting](https://discord.com/developers/docs/reference#message-formatting) for more information on how to properly format messages.
+   * @param channelId The id of channel to create message
+   */
+  createMessage(channelId: string, data: RESTPostAPIChannelMessageJSONBody, files?: { name: string; description?: string; blob: Blob }[]): Promise<APIMessage> {
+    let d: FormData | string;
+    let contentType: string | undefined;
 
     if (files?.length) {
       contentType = undefined;
@@ -78,31 +86,31 @@ export class Rest extends EventEmitter {
     return this.post(Routes.channelMessages(channelId), d, contentType) as Promise<APIMessage>;
   }
 
-  respondInteraction (interactionId: string, interactionToken: string, data: APIInteractionResponseCallbackData, type: InteractionResponseType) {
+  respondInteraction(interactionId: string, interactionToken: string, data: APIInteractionResponseCallbackData, type: InteractionResponseType) {
     return this.post(Routes.interactionCallback(interactionId, interactionToken), JSON.stringify({ type, data }));
   }
 
-  getWebhookMessage (webhookId: string, webhookToken: string, messageId: string): Promise<APIMessage> {
+  getWebhookMessage(webhookId: string, webhookToken: string, messageId: string): Promise<APIMessage> {
     return this.get(Routes.webhookMessage(webhookId, webhookToken, messageId)) as Promise<APIMessage>;
   }
 
-  getUser (userId: string) {
+  getUser(userId: string) {
     return this.get(Routes.user(userId)) as Promise<APIUser>;
   }
 
-  getGuild (guildId: string) {
+  getGuild(guildId: string) {
     return this.get(Routes.guild(guildId)) as Promise<APIGuild>;
   }
 
-  getGateway () {
+  getGateway() {
     return this.get(Routes.gatewayBot()) as Promise<APIGatewayBotInfo>;
   }
 
-  getCurrentApplication () {
+  getCurrentApplication() {
     return this.get(Routes.oauth2CurrentApplication()) as Promise<APIApplication>;
   }
 }
 export declare interface Rest {
-  on<E extends keyof RestEvents>(event: E, listener: (...args: RestEvents[E]) => unknown): this
-  emit<E extends keyof RestEvents>(event: E, data: unknown): boolean
+  on<E extends keyof RestEvents>(event: E, listener: (...args: RestEvents[E]) => unknown): this;
+  emit<E extends keyof RestEvents>(event: E, data: unknown): boolean;
 }

@@ -1,4 +1,4 @@
-export function parse (res: Response) {
+export function parse(res: Response) {
   let result;
 
   if (res.status === 204) {

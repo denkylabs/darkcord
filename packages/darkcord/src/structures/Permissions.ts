@@ -3,22 +3,23 @@ import { PermissionFlagsBits } from "discord-api-types/v10";
 export class Permissions {
   allow: bigint;
   deny: bigint;
-  constructor (allow: bigint, deny = 0
-  ) {
+
+  constructor(allow: bigint, deny = 0) {
     this.allow = BigInt(allow);
     this.deny = BigInt(deny);
   }
 
   /**
-     * Check if this permission allows a specific permission
-     * @param permissions The permissions bits to verify
-     */
-  has (permissions: bigint) {
+   * Check if this permission allows a specific permission
+   * @param permissions The permissions bits to verify
+   */
+  has(permissions: bigint) {
     return (this.allow & permissions) === permissions;
   }
 
   static Flags = PermissionFlagsBits;
-  static AllText = this.Flags.CreateInstantInvite |
+  static AllText =
+    this.Flags.CreateInstantInvite |
     this.Flags.ManageChannels |
     this.Flags.AddReactions |
     this.Flags.ViewChannel |
@@ -39,7 +40,8 @@ export class Permissions {
     this.Flags.CreatePublicThreads |
     this.Flags.SendMessagesInThreads;
 
-  static AllVoice = this.Flags.CreateInstantInvite |
+  static AllVoice =
+    this.Flags.CreateInstantInvite |
     this.Flags.ManageChannels |
     this.Flags.PrioritySpeaker |
     this.Flags.Stream |
@@ -54,7 +56,8 @@ export class Permissions {
     this.Flags.RequestToSpeak |
     this.Flags.UseEmbeddedActivities;
 
-  static AllGuild = this.Flags.KickMembers |
+  static AllGuild =
+    this.Flags.KickMembers |
     this.Flags.BanMembers |
     this.Flags.Administrator |
     this.Flags.ManageChannels |

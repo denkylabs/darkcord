@@ -1,9 +1,9 @@
 import { ClientOptions, ConnectionType } from "../client/ClientBuilder.ts";
 import { DefaultIntents } from "./Utils.ts";
 
-type RClientOptions = ClientOptions<ConnectionType>
+type RClientOptions = ClientOptions<ConnectionType>;
 
-export function verifyOptions (options?: RClientOptions) {
+export function verifyOptions(options?: RClientOptions) {
   if (!options) {
     return {
       intents: DefaultIntents
@@ -22,11 +22,7 @@ export function verifyOptions (options?: RClientOptions) {
     const received = typeof options[key as keyof RClientOptions];
 
     if (received !== types[key as keyof typeof types]) {
-      throw new TypeError(
-        `The ${key} must be a ${
-          types[key as keyof typeof types]
-        }, but received ${received}`
-      );
+      throw new TypeError(`The ${key} must be a ${types[key as keyof typeof types]}, but received ${received}`);
     }
   }
 

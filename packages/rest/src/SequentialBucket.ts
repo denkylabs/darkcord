@@ -1,72 +1,72 @@
-import { AsyncBucket as Bucket } from "./AsyncBucket.ts"
-import type { Rest } from "./Rest.ts"
+import { AsyncBucket as Bucket } from "./AsyncBucket.ts";
+import type { Rest } from "./Rest.ts";
 
 export class SequentialBucket {
-  globalLimit: number
-  globalRemaining: number
-  globalReset: number | null
-  globalDelay: number | null | Promise<void>
-  retryLimit: number
-  restTimeOffset: number
-  timers: Set<number>
-  buckets: Map<string, Bucket>
+  globalLimit: number;
+  globalRemaining: number;
+  globalReset: number | null;
+  globalDelay: number | null | Promise<void>;
+  retryLimit: number;
+  restTimeOffset: number;
+  timers: Set<number>;
+  buckets: Map<string, Bucket>;
 
-  constructor (public rest: Rest) {
-    this.globalLimit = Infinity
+  constructor(public rest: Rest) {
+    this.globalLimit = Infinity;
 
-    this.globalRemaining = this.globalLimit
+    this.globalRemaining = this.globalLimit;
 
-    this.globalReset = null
+    this.globalReset = null;
 
-    this.globalDelay = null
+    this.globalDelay = null;
 
-    this.retryLimit = 1
+    this.retryLimit = 1;
 
-    this.restTimeOffset = 0
+    this.restTimeOffset = 0;
 
-    this.timers = new Set()
+    this.timers = new Set();
 
-    this.buckets = new Map()
+    this.buckets = new Map();
   }
 
-  async execute (bucket: Bucket, promiseFn: () => Promise<unknown>) {
-    await bucket.queue.wait()
+  async execute(bucket: Bucket, promiseFn: () => Promise<unknown>) {
+    await bucket.queue.wait();
 
-    let data
+    let data;
     try {
-      data = await promiseFn()
-      this.rest.emit("request", data)
+      data = await promiseFn();
+      this.rest.emit("request", data);
     } finally {
-      bucket.queue.shift()
+      bucket.queue.shift();
     }
 
-    return data
+    return data;
   }
 
-  get limited () {
-    return this.globalRemaining <= 0 && Date.now() < Number(this.globalReset)
+  get limited() {
+    return this.globalRemaining <= 0 && Date.now() < Number(this.globalReset);
   }
 
-  setTimeout (fn: () => unknown, ms: number) {
+  setTimeout(fn: () => unknown, ms: number) {
     const timer = setTimeout(async () => {
-      this.timers.delete(timer)
-      await fn()
-    }, ms)
+      this.timers.delete(timer);
+      await fn();
+    }, ms);
 
-    this.timers.add(timer)
-    return timer
+    this.timers.add(timer);
+    return timer;
   }
 
-  add (router: string, bucket: Bucket) {
-    this.buckets.set(router, bucket)
-    return bucket
+  add(router: string, bucket: Bucket) {
+    this.buckets.set(router, bucket);
+    return bucket;
   }
 
-  get (router: string) {
-    return this.buckets.get(router)
+  get(router: string) {
+    return this.buckets.get(router);
   }
 
-  remove (router: string) {
-    return this.buckets.delete(router)
+  remove(router: string) {
+    return this.buckets.delete(router);
   }
 }

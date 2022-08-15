@@ -1,15 +1,15 @@
 interface PromiseQueue {
-    resolve: CallableFunction
-    promise: Promise<unknown>
+  resolve: CallableFunction;
+  promise: Promise<unknown>;
 }
 
 export class AsyncQueue {
   promises: PromiseQueue[] = [];
-  get remaining () {
+  get remaining() {
     return this.promises.length;
   }
 
-  wait () {
+  wait() {
     const next = this.promises.length !== 0 ? this.promises[this.promises.length - 1].promise : Promise.resolve();
 
     let resolveFn: CallableFunction | undefined;
@@ -25,7 +25,7 @@ export class AsyncQueue {
     return next;
   }
 
-  shift () {
+  shift() {
     const deferred = this.promises.shift();
     deferred?.resolve();
   }

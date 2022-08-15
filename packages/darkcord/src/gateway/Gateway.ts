@@ -1,7 +1,14 @@
 import { ApiVersion as DiscordApiVersion } from "darkcord/rest/src/utils/utils.ts";
 import { delay } from "deno/async";
 import {
-  APIGatewayBotInfo, APIUnavailableGuild, GatewayCloseCodes, GatewayDispatchEvents, GatewayOpcodes, GatewayReceivePayload, GatewaySendPayload, type GatewayHelloData,
+  APIGatewayBotInfo,
+  APIUnavailableGuild,
+  GatewayCloseCodes,
+  GatewayDispatchEvents,
+  GatewayOpcodes,
+  GatewayReceivePayload,
+  GatewaySendPayload,
+  type GatewayHelloData,
   type GatewayResumeData
 } from "discord-api-types/v10";
 import { decompress_with } from "zlib";
@@ -12,22 +19,22 @@ import * as EventActions from "./actions/actions.ts";
 
 const decoder = new TextDecoder();
 export interface GatewayOptions {
-    /**
-     * The encoding of received gateway packets
-     */
-    encoding?: "json" | "etf"
-    /**
-     * Recommended to compress gateway packets
-     * */
-    compress?: boolean
-    /**
-     * The id of this gateway shard
-     */
-    shardId: string
+  /**
+   * The encoding of received gateway packets
+   */
+  encoding?: "json" | "etf";
+  /**
+   * Recommended to compress gateway packets
+   * */
+  compress?: boolean;
+  /**
+   * The id of this gateway shard
+   */
+  shardId: string;
 }
 
 export class GatewayError extends Error {
-  constructor (message: string, public code: GatewayCloseCodes, public shardId: string) {
+  constructor(message: string, public code: GatewayCloseCodes, public shardId: string) {
     super(message);
   }
 }
@@ -47,15 +54,15 @@ export class Gateway {
    */
   readonly shardId: string;
   /**
-     * This gateway shard ping
-     */
+   * This gateway shard ping
+   */
   ping: number;
   fetchedGateway?: APIGatewayBotInfo;
   sessionId?: string;
   pendingGuilds?: number;
   pendingGuildsMap: Map<string, APIUnavailableGuild>;
   uptime?: Date;
-  constructor (public client: GatewayClient, options?: GatewayOptions) {
+  constructor(public client: GatewayClient, options?: GatewayOptions) {
     this.connected = false;
 
     this.preReady = false;
@@ -70,11 +77,13 @@ export class Gateway {
 
     this.ping = -1;
 
-    this.options = Object.freeze(options ?? {
-      encoding: "json",
-      compress: false,
-      shardId: "0"
-    }) as Readonly<Required<GatewayOptions>>;
+    this.options = Object.freeze(
+      options ?? {
+        encoding: "json",
+        compress: false,
+        shardId: "0"
+      }
+    ) as Readonly<Required<GatewayOptions>>;
 
     this.shardId = this.options.shardId;
 
@@ -84,7 +93,7 @@ export class Gateway {
   /**
    * Connect to discord gateway
    */
-  async connect () {
+  async connect() {
     if (this.fetchedGateway === undefined) {
       this.fetchedGateway = await this.client.getGateway();
     }
@@ -95,7 +104,7 @@ export class Gateway {
   /**
    * Initialize websocket
    */
-  init () {
+  init() {
     let wsUrl = `${DiscordGatewayURL}?v${DiscordApiVersion}&encoding=${this.options.encoding}`;
 
     if (this.options.compress === true) {
@@ -112,7 +121,7 @@ export class Gateway {
   /**
    * Reconnect gateway
    */
-  reconnect () {
+  reconnect() {
     if (this.destroyed) {
       return;
     }
@@ -129,7 +138,7 @@ export class Gateway {
    * @param code Close code
    * @param reason Close reason
    */
-  close (code: number, reason?: string) {
+  close(code: number, reason?: string) {
     this.#debug(`Closing Gateway with code ${code}${reason !== undefined ? ` and reason ${reason}` : ""} `);
     this.ws?.close(code, reason);
 
@@ -142,7 +151,7 @@ export class Gateway {
   /**
    * Destroy this gateway shard
    */
-  destroy () {
+  destroy() {
     this.#debug("Destroying shard...");
     this.destroyed = true;
 
@@ -158,14 +167,14 @@ export class Gateway {
    * Send data to gateway
    * @param data The data to be sent
    */
-  send (data: GatewaySendPayload) {
+  send(data: GatewaySendPayload) {
     this.ws?.send(JSON.stringify(data));
   }
 
   /**
    * Send heartbeat to discord
    */
-  sendHeartbeat () {
+  sendHeartbeat() {
     this.send({
       op: GatewayOpcodes.Heartbeat,
       d: this.sequenceId ?? null
@@ -173,7 +182,7 @@ export class Gateway {
     this.lastHeartbeatAck = Date.now();
   }
 
-  ackHeartbeat () {
+  ackHeartbeat() {
     if (this.destroyed === true) {
       return;
     }
@@ -190,7 +199,7 @@ export class Gateway {
     this.sendHeartbeat();
   }
 
-  resume () {
+  resume() {
     if (this.sessionId === undefined) {
       this.identify();
     }
@@ -205,7 +214,7 @@ export class Gateway {
     });
   }
 
-  identify () {
+  identify() {
     if (this.client.token.startsWith("Bot") === false) {
       throw new Error("Invalid token");
     }
@@ -227,17 +236,17 @@ export class Gateway {
           device: customProps?.device ?? "Darkcord"
         },
         compress: this.options.compress,
-        shard: [Number(this.shardId), this.client.options.gateway?.totalShards ?? this.fetchedGateway?.shards as number]
+        shard: [Number(this.shardId), this.client.options.gateway?.totalShards ?? (this.fetchedGateway?.shards as number)]
       }
     });
   }
 
-  #onOpen () {
+  #onOpen() {
     this.#debug("Connected to Discord Gateway");
     this.client.emit(Events.Connect);
   }
 
-  async #onClose (closeEvent: CloseEvent) {
+  async #onClose(closeEvent: CloseEvent) {
     if (this.destroyed) {
       return;
     }
@@ -254,8 +263,8 @@ export class Gateway {
     await this.#handleClose(code);
   }
 
-  async #handleClose (code: GatewayCloseCodes) {
-    const handler = ({
+  async #handleClose(code: GatewayCloseCodes) {
+    const handler = {
       [GatewayCloseCodes.UnknownOpcode]: () => {
         throw this.#error("Received unknown op code", code);
       },
@@ -301,7 +310,7 @@ export class Gateway {
       [GatewayCloseCodes.SessionTimedOut]: () => {
         this.#debug("Session Timeout. Reconnecting...");
       }
-    })[code];
+    }[code];
 
     if (handler === undefined) {
       this.#debug("Unknown close code. Reconnecting in 5s.");
@@ -311,7 +320,7 @@ export class Gateway {
     }
   }
 
-  #onMessage (message: MessageEvent) {
+  #onMessage(message: MessageEvent) {
     try {
       let { data } = message;
 
@@ -334,12 +343,12 @@ export class Gateway {
     }
   }
 
-  #onPacket (data: GatewayReceivePayload | GatewaySendPayload) {
+  #onPacket(data: GatewayReceivePayload | GatewaySendPayload) {
     this.#handlePacket(data);
   }
 
-  #handlePacket (data: GatewayReceivePayload | GatewaySendPayload) {
-    const handler = ({
+  #handlePacket(data: GatewayReceivePayload | GatewaySendPayload) {
+    const handler = {
       [GatewayOpcodes.Hello]: (d: GatewayHelloData) => {
         this.heartbeatInterval = d.heartbeat_interval;
         this.#debug(`Received Hello, heartbeat interval: ${this.heartbeatInterval}`);
@@ -384,9 +393,7 @@ export class Gateway {
         if (t !== null && t !== undefined) {
           this.client.emit(`RAW_${t}`, d);
 
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const actions = EventActions as any;
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           actions[t]?.call(this, d as any);
         }
       },
@@ -401,30 +408,28 @@ export class Gateway {
         this.#debug("Received reconnect Op Code");
         this.reconnect();
       }
-    })[data.op as number];
+    }[data.op as number];
 
     if (handler !== undefined) {
-      return handler(
-        data.d as typeof handler[keyof typeof handler],
-        (data as { s: number }).s,
-        (data as { t: GatewayDispatchEvents }).t
-      );
+      return handler(data.d as typeof handler[keyof typeof handler], (data as { s: number }).s, (data as { t: GatewayDispatchEvents }).t);
     }
+
+    return null;
   }
 
-  #error (message: string, code: number) {
+  #error(message: string, code: number) {
     return new GatewayError(message, code, this.shardId);
   }
 
-  #debug (message: string) {
+  #debug(message: string) {
     this.client.emit(Events.ShardDebug, message, this.shardId);
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  _emit <E extends keyof typeof Events> (event: E, ...args: ClientEvents[typeof Events[E]]) {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-    this.client.emit(Events[event], ...args as unknown);
+  _emit<E extends keyof typeof Events>(event: E, ...args: ClientEvents[typeof Events[E]]) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    this.client.emit(Events[event], ...(args as unknown));
   }
 }

@@ -11,5 +11,5 @@ export interface CacheFetchOptions {
   /**
    * Returns api object instead of structure
    */
-  api?: boolean
+  api?: boolean;
 }

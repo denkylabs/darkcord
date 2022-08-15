@@ -2,7 +2,7 @@ import { User } from "../structures/User.ts";
 import { Cache, CacheFetchOptions } from "./Cache.ts";
 
 export class UserCache extends Cache<User> {
-  async fetch (options: CacheFetchOptions, useCacheIfExists = false) {
+  async fetch(options: CacheFetchOptions, useCacheIfExists = false) {
     const { client, id, api } = options;
 
     if (useCacheIfExists && this.has(id)) {
