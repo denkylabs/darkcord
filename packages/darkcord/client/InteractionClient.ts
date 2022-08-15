@@ -1,14 +1,27 @@
 import {BaseClient} from "./BaseClient.ts"
 import {GatewayDispatchEvents, InteractionResponseType, InteractionType} from "discord-api-types/v10"
 import {Interaction} from "../structures/Interaction.ts"
-// eslint-disable-next-line camelcase
-import {sign_detached_verify} from "tweetnacl"
+import * as ed25519 from "ed25519"
+import {CacheFactoryOptions} from "../utils/CacheFactory.ts"
+import type {BuilderRequestOptions} from "./ClientBuilder.ts"
 
 export class InteractionClient extends BaseClient {
-  constructor (public publicKey: string, token?: string) {
+  constructor (
+    public publicKey: string,
+    token?: string,
+    cacheFactoryOptions?: CacheFactoryOptions,
+    _requestOptions?: BuilderRequestOptions
+  ) {
     super({
-      factory: {
-        GuildCache: 100
+      factory: cacheFactoryOptions ?? {
+        GuildCache: Infinity
+      },
+      guilds: undefined,
+      users: undefined,
+      channels: undefined
+    }, _requestOptions ?? {
+      queue: {
+        auto: false
       }
     })
 
@@ -19,6 +32,7 @@ export class InteractionClient extends BaseClient {
   async connect (port: number) {
     // Creating http server
     const server = Deno.listen({port})
+    this.application = await this.rest.getCurrentApplication()
 
     for await (const conn of server) {
       await this.#serveHttp(conn)
@@ -26,13 +40,14 @@ export class InteractionClient extends BaseClient {
   }
   async #serveHttp (conn: Deno.Conn) {
     const httpConn = Deno.serveHttp(conn)
+    const decoder = new TextDecoder()
 
     for await (const event of httpConn) {
       const timestamp = event.request.headers.get("X-Signature-Timestamp") as string
       const signature = event.request.headers.get("X-Signature-Ed25519") as string
 
-      const body = await event.request.json()
       const rawBody = await event.request.arrayBuffer()
+      const body = JSON.parse(decoder.decode(rawBody))
 
       if (!this.#verifyKey(rawBody, signature, timestamp)) {
         throw new RangeError("Invalid verify key")
@@ -64,7 +79,7 @@ export class InteractionClient extends BaseClient {
 
       const publicKeyData = this.#toHexUint8Array(this.publicKey)
       const signatureData = this.#toHexUint8Array(signature)
-      return sign_detached_verify(message, signatureData, publicKeyData)
+      return ed25519.verify(message, signatureData, publicKeyData)
     } catch {
       return false
     }
