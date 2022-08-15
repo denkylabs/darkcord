@@ -5,6 +5,8 @@ import {
 } from "discord-api-types/v10"
 import {Guild} from "./Guild.ts"
 import {RoleCache} from "../cache/RoleCache.ts"
+import {User} from "./User.ts"
+import type {BaseClient} from "../client/BaseClient.ts"
 
 export class Emoji {
   readonly name: string | null
@@ -14,27 +16,16 @@ export class Emoji {
   readonly available?: boolean | null
   readonly requireColons?: boolean
   readonly roles: RoleCache
-  readonly user: any
-  constructor (data: APIEmoji, guild?: Guild) {
+  readonly user: User | null
+  constructor (public data: APIEmoji, client: BaseClient, public guild?: Guild) {
     this.name = data.name
     this.id = data.id
     this.animated = data.animated ?? false
     this.managed = data.managed ?? false
     this.available = data.available
     this.requireColons = data.require_colons
-    this.roles = guild?.client.cache.factory.makeEmojiRolesCache() ?? new RoleCache()
-
-    if (guild && data.roles) {
-      for (const _role of data.roles) {
-        const role = guild.roles.get(_role)
-
-        if (role !== undefined) {
-          this.roles.add(role)
-        }
-      }
-    }
-
-    this.user = data.user
+    this.roles = client.cache.factory.makeEmojiRolesCache()
+    this.user = data.user ? new User(data.user, client) : null
   }
 }
 
@@ -51,9 +42,9 @@ export class Reaction {
    * Whether the current client reacted using this emoji
    */
   me: boolean
-  constructor (data: APIReaction) {
+  constructor (public data: APIReaction, public client: BaseClient) {
     this.count = data.count
-    this.emoji = new Emoji(data.emoji)
+    this.emoji = new Emoji(data.emoji, client)
     this.me = data.me
   }
 }

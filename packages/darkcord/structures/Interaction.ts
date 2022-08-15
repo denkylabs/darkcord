@@ -17,6 +17,7 @@ import {
   APIGuildMember
 } from "discord-api-types/v10"
 import {BaseClient} from "../client/BaseClient.ts"
+import {QueueMode} from "../client/ClientBuilder.ts"
 import {InteractionRespondRestAction} from "./actions/Interaction.ts"
 import {Base} from "./Base.ts"
 import {Guild} from "./Guild.ts"
@@ -106,11 +107,9 @@ export class ApplicationCommandInteraction extends Interaction {
     this.guildId = data.guild_id
     this.guildLocale = data.guild_locale
     this.channelId = data.channel_id
-
-    this.guild = this.guildId !== undefined ? client.cache.guilds.get(this.guildId) : null
   }
   reply (data: APIInteractionResponseCallbackData) {
-    return InteractionRespondRestAction.createAction(this, data, async (d) => {
+    const action = InteractionRespondRestAction.createAction(this, data, async (d) => {
       if (this.#respondInteraction !== undefined) {
         const respond = this.#respondInteraction as RespondFunc
 
@@ -127,8 +126,15 @@ export class ApplicationCommandInteraction extends Interaction {
         )
       }
 
-      return this.client.rest.getWebhookMessage(this.id, this.token, "@original") as unknown as Promise<APIMessageInteraction>
+      return this.client.rest.getWebhookMessage(this.client.application?.id as string, this.token, "@original") as unknown as Promise<APIMessageInteraction>
     })
+
+    const {queue} = this.client._requestOptions
+    if (queue.auto === true) {
+      return queue.mode === QueueMode.Normal ? action.queue() : action.complete()
+    }
+
+    return action
   }
 }
 
@@ -218,12 +224,12 @@ export class MessageInteraction extends Base {
    * The guild member who invoked the interaction, only sent in MESSAGE_CREATE events
    */
   member: Member|null
-  constructor (data: APIMessageInteraction, client: BaseClient, guild?: Guild) {
+  constructor (public data: APIMessageInteraction, public client: BaseClient, public guild?: Guild) {
     super(data.id)
     const {member} = data
     this.name = data.name
     this.type = data.type
-    this.user = new User(data.user)
-    this.member = member !== undefined && guild !== undefined ? new Member(data.member as APIGuildMember, guild as Guild, client) : null
+    this.user = new User(data.user, client)
+    this.member = member !== undefined && guild !== undefined ? new Member(data.member as APIGuildMember, guild as Guild) : null
   }
 }
