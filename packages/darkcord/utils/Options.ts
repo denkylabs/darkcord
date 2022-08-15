@@ -1,7 +1,9 @@
-import {ClientOptions} from "../client/ClientBuilder.ts"
+import {ClientOptions, ConnectionType} from "../client/ClientBuilder.ts"
 import {DefaultIntents} from "./Utils.ts"
 
-export function verifyOptions (options?: ClientOptions) {
+type RClientOptions = ClientOptions<ConnectionType>
+
+export function verifyOptions (options?: RClientOptions) {
   if (!options) {
     return {
       intents: DefaultIntents
@@ -11,11 +13,14 @@ export function verifyOptions (options?: ClientOptions) {
   const types = {
     intents: "number",
     type: "number",
-    cacheFactory: "object"
+    cacheFactory: "object",
+    gateway: "object",
+    requests: "object"
   }
 
   for (const key of Object.keys(options)) {
-    const received = typeof options[key as keyof ClientOptions]
+    const received = typeof options[key as keyof RClientOptions]
+
     if (received !== types[key as keyof typeof types]) {
       throw new TypeError(
         `The ${key} must be a ${
@@ -24,5 +29,6 @@ export function verifyOptions (options?: ClientOptions) {
       )
     }
   }
+
   return options
 }
