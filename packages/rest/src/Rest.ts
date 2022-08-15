@@ -1,3 +1,4 @@
+import { MessagePostData } from "darkcord/src/structures/Message.ts";
 import EventEmitter from "deno/events";
 import {
   APIApplication,
@@ -10,7 +11,6 @@ import {
   RESTPostAPIChannelMessageJSONBody,
   Routes
 } from "discord-api-types/v10";
-import { MessagePostData } from "darkcord/src/structures/Message.ts";
 import { RequestHandler } from "./RequestHandler.ts";
 
 export interface RateLimitEvent {
@@ -29,11 +29,13 @@ export interface RestEvents {
 
 export class Rest extends EventEmitter {
   requestHandler: RequestHandler;
+
   get: (router: string) => Promise<unknown>;
   post: (router: string, body?: BodyInit | undefined, contentType?: string | undefined) => Promise<unknown>;
   patch: (router: string, body?: BodyInit | undefined, contentType?: string | undefined) => Promise<unknown>;
   delete: (router: string) => Promise<unknown>;
   put: (router: string, body?: BodyInit | undefined, contentType?: string | undefined) => Promise<unknown>;
+
   constructor(token?: string, public requestTimeout = 15_000) {
     super();
     this.requestHandler = new RequestHandler(this, {
@@ -41,9 +43,13 @@ export class Rest extends EventEmitter {
     });
 
     this.get = this.requestHandler.get.bind(this.requestHandler);
+
     this.post = this.requestHandler.post.bind(this.requestHandler);
+
     this.patch = this.requestHandler.patch.bind(this.requestHandler);
+
     this.delete = this.requestHandler.delete.bind(this.requestHandler);
+
     this.put = this.requestHandler.put.bind(this.requestHandler);
   }
 
