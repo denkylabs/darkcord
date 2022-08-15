@@ -2,7 +2,13 @@ import {AsyncQueue} from "./AsyncQueue.ts"
 
 export class AsyncBucket {
   queue: AsyncQueue
-  constructor (public limit: number, public remaining: number, public reset: number) {
+  remaining: number
+  limit: number
+  reset: number
+  constructor () {
+    this.remaining = 0
+    this.limit = -1
+    this.reset = -1
     this.queue = new AsyncQueue()
   }
   get limited () {

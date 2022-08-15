@@ -6,7 +6,15 @@ export class DiscordAPIError extends Error {
     errors: Record<string, unknown>) {
     super()
 
-    this.message = JSON.stringify(errors)
+    this.name = "DiscordAPIError"
+    if (Array.isArray(errors)) {
+      errors.push({code, method, router})
+    } else {
+      errors.code = code
+      errors.method = method
+      errors.router = router
+    }
+    this.message = JSON.stringify(errors, null, 4)
   }
 }
 
@@ -19,5 +27,6 @@ export class RequestError extends Error {
     public code: number
   ) {
     super()
+    this.name = "RequestError"
   }
 }

@@ -1,5 +1,5 @@
 import {APIMessage} from "discord-api-types/v10"
-import {RestAction} from "darkcord/rest"
+import {RestAction, RestActionCompleteOptions, RestActionQueueOptions} from "darkcord/rest"
 import {TextChannel} from "../Channel.ts"
 import {MessagePostData, Message} from "../Message.ts"
 
@@ -13,11 +13,21 @@ export class TextChannelCreateMessageRestAction extends RestAction<APIMessage> {
   ) {
     super(action)
   }
-  async complete () {
+  async complete (options?: RestActionCompleteOptions) {
     const data = await this._complete(this.data)
+
+    if (options?.returnApiObject === true) {
+      return data
+    }
+
     return new Message(data, this.channel.client)
   }
-  async queue () {
+  async queue (options?: RestActionQueueOptions) {
+    if (options?.sendIn !== undefined) {
+      setTimeout(() => this.queue({isImportant: options.isImportant}), options.sendIn)
+      return
+    }
+
     await this._complete(this.data)
   }
   static createAction (channel: TextChannel, data: MessagePostData, action: MessagePostRestActionFunc) {

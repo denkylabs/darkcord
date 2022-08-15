@@ -1,18 +1,27 @@
 import {Rest} from "darkcord/rest"
 import EventEmitter from "deno/events"
-import {ClientEvents} from "../Events.ts"
-import {CacheFactory, CacheFactoryOptions} from "../utils/CacheFactory.ts"
-import {GuildCache} from "../cache/GuildCache.ts"
+import type {ClientEvents, RawClientEvents} from "../Events.ts"
+import {CacheFactory, type CacheFactoryOptions} from "../utils/CacheFactory.ts"
+import type {GuildCache} from "../cache/GuildCache.ts"
+import type {UserCache} from "../cache/UserCache.ts"
+import {ChannelCacheManager} from "../cache/ChannelCache.ts"
+import {BuilderRequestOptions} from "./ClientBuilder.ts"
+import {User} from "../structures/User.ts"
+import {APIApplication} from "discord-api-types/v10"
 
 export interface ClientCache<Options = false> {
-  guilds: GuildCache
-  factory: Options extends true ? CacheFactoryOptions : CacheFactory
+  guilds: Options extends true ? undefined : GuildCache;
+  users: Options extends true ? undefined : UserCache;
+  channels: Options extends true ? undefined : ChannelCacheManager;
+  factory: Options extends true ? CacheFactoryOptions : CacheFactory;
 }
 
 export abstract class BaseClient extends EventEmitter {
   rest: Rest
   cache: ClientCache
-  protected constructor (cache: ClientCache<true>) {
+  user?: User
+  application?: APIApplication
+  protected constructor (cache: ClientCache<true>, public _requestOptions: BuilderRequestOptions) {
     super()
 
     this.rest = new Rest()
@@ -22,12 +31,19 @@ export abstract class BaseClient extends EventEmitter {
       const factory = new CacheFactory(cache.factory as CacheFactoryOptions, this)
       this.cache = {
         factory,
-        guilds: factory.makeGuildCache()
+        users: factory.makeUserCache(),
+        guilds: factory.makeGuildCache(),
+        channels: factory.makeChannelsCacheManager()
       }
     }
   }
-  on<E extends keyof ClientEvents> (event: E, listener: (...args: ClientEvents[E]) => unknown) {
-    super.on(event, listener)
-    return this
-  }
+}
+export declare interface BaseClient {
+  on<E extends keyof (RawClientEvents & ClientEvents)> (event: E, listener: (...args: (RawClientEvents & ClientEvents)[E]) => unknown): this
+  on<E extends keyof RawClientEvents> (event: E, listener: (...args: RawClientEvents[E]) => unknown): this
+  on<E extends keyof ClientEvents>(event: E, listener: (...args: ClientEvents[E]) => unknown): this
+
+  emit<E extends keyof (RawClientEvents & ClientEvents)> (event: E, ...args: (RawClientEvents & ClientEvents)[E]): boolean
+  emit<E extends keyof RawClientEvents> (event: E, ...args: RawClientEvents[E]): boolean
+  emit<E extends keyof ClientEvents> (event: E, ...args: ClientEvents[E]): boolean
 }

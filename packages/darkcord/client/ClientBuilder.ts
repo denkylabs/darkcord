@@ -1,24 +1,47 @@
-import {GatewayClient} from "./GatewayClient.ts"
+import {
+  GatewayClient,
+  type GatewayOptions
+} from "./GatewayClient.ts"
 import {InteractionClient} from "./InteractionClient.ts"
 import {GatewayIntentBits} from "discord-api-types/v10"
 import {verifyOptions} from "../utils/Options.ts"
-import {CacheFactoryOptions} from "../utils/CacheFactory.ts"
-
-type BuiltClient = GatewayClient | InteractionClient
-type DiscordToken = `Bot ${string}`
+import type {CacheFactoryOptions} from "../utils/CacheFactory.ts"
+import type {CacheAdapter} from "../cache/Cache.ts"
+import {
+  type DiscordToken,
+  DefaultIntents
+} from "../utils/Utils.ts"
 
 export enum ConnectionType {
     Gateway = 0,
     Interaction = 1
 }
 
-export interface ClientOptions {
-    type?: ConnectionType;
-    intents?: GatewayIntentBits;
-    cacheFactory?: CacheFactoryOptions
+export enum QueueMode {
+  Normal = 0,
+  Complete = 1,
+  ApiObjects = 2
 }
 
-export class ClientBuilder {
+export interface BuilderRequestOptions {
+  queue: {
+    auto: boolean;
+    /**
+     * Only if the options auto is true
+     */
+    mode?: QueueMode
+  }
+}
+
+export interface ClientOptions<T extends ConnectionType> {
+  type?: T;
+  intents?: GatewayIntentBits;
+  cacheFactory?: CacheFactoryOptions & {adapter?: CacheAdapter<unknown>};
+  gateway?: GatewayOptions;
+  requests?: BuilderRequestOptions
+}
+
+export class ClientBuilder<T extends ConnectionType> {
   /**
      * Authenticator of this client
      */
@@ -26,9 +49,10 @@ export class ClientBuilder {
   /**
      * Options of this client
      */
-  options: ClientOptions
-  constructor(publicKey: string, options?: ClientOptions & { token?: DiscordToken })
-  constructor (token: DiscordToken, options: ClientOptions = {}) {
+  options: ClientOptions<T>
+  constructor (publicKey: string, options?: ClientOptions<ConnectionType.Interaction> & { token?: DiscordToken })
+  constructor (token: DiscordToken, options?: ClientOptions<ConnectionType.Gateway>)
+  constructor (token: DiscordToken, options: ClientOptions<T> = {}) {
     this.auth = token
     if (!options.cacheFactory) {
       options.cacheFactory = {
@@ -36,13 +60,16 @@ export class ClientBuilder {
       }
     }
 
-    this.options = verifyOptions(options)
+    this.options = verifyOptions(options) as ClientOptions<T>
+    if (options.intents === undefined) {
+      this.options.intents = DefaultIntents
+    }
   }
   /**
      * Set connection type
      * @param type The type of connection
      */
-  setType (type: ConnectionType) {
+  setType (type: T) {
     this.options.type = type
     return this
   }
@@ -57,11 +84,22 @@ export class ClientBuilder {
   /**
      * Build the client and returns BuiltClient
      */
-  build (): BuiltClient {
+  build () {
     if (this.options.type === ConnectionType.Gateway) {
-      return new GatewayClient(this.auth)
+      return new GatewayClient(
+        this.auth as DiscordToken,
+        this.options.intents as number,
+        this.options.cacheFactory,
+        this.options.gateway,
+        this.options.requests
+      )
     }
 
-    return new InteractionClient(this.auth)
+    return new InteractionClient(
+      this.auth,
+      (this.options as ClientOptions<T> & { token?: DiscordToken }).token,
+      this.options.cacheFactory,
+      this.options.requests
+    )
   }
 }

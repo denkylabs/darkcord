@@ -5,6 +5,15 @@ export * from "./RequestHandler.ts"
 export * from "./Rest.ts"
 export * from "./SequentialBucket.ts"
 
+export interface RestActionQueueOptions {
+  sendIn?: number;
+  isImportant?: boolean;
+}
+
+export interface RestActionCompleteOptions extends RestActionQueueOptions {
+  returnApiObject?: boolean
+}
+
 export abstract class RestAction<Data> {
   _complete: (value: any) => Promise<Data>
   constructor (complete: (value: any) => Promise<Data>) {
@@ -15,10 +24,10 @@ export abstract class RestAction<Data> {
    * @param important If this request is important
    * @returns structure
    */
-  abstract complete(important?: boolean): Promise<any>
+  abstract complete(options: RestActionCompleteOptions): Promise<any>
   /**
    * Complete request and add to queue
    * @param important If this request is important
    */
-  abstract queue(important?: boolean): Promise<void>
+  abstract queue(options: RestActionQueueOptions): Promise<void>
 }

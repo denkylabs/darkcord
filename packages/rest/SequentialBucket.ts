@@ -20,6 +20,19 @@ export class SequentialBucket {
     this.timers = new Set()
     this.buckets = new Map()
   }
+  async execute (bucket: Bucket, promiseFn: () => Promise<unknown>) {
+    await bucket.queue.wait()
+
+    let data
+    try {
+      data = await promiseFn()
+      this.rest.emit("request", data)
+    } finally {
+      bucket.queue.shift()
+    }
+
+    return data
+  }
   get limited () {
     return this.globalRemaining <= 0 && Date.now() < Number(this.globalReset)
   }

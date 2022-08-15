@@ -1,5 +1,6 @@
 import {Base} from "./Base.ts"
 import {APIUser, UserFlags as Flags, UserPremiumType, LocaleString} from "discord-api-types/v10"
+import {BaseClient} from "../client/BaseClient.ts"
 
 export class UserFlags {
   constructor (public rawFlags: Flags) { }
@@ -20,7 +21,7 @@ export class User extends Base {
   readonly locale?: LocaleString
   readonly nitroType?: UserPremiumType
   readonly publicFlags?: UserFlags
-  constructor (data: APIUser) {
+  constructor (data: APIUser, public client: BaseClient) {
     super(data.id)
 
     this.username = data.username

@@ -1,7 +1,7 @@
 import {Cache, CacheFetchOptions} from "./Cache.ts"
-import {Guild} from "../structures/Guild.ts"
+import {User} from "../structures/User.ts"
 
-export class GuildCache extends Cache<Guild> {
+export class UserCache extends Cache<User> {
   async fetch (options: CacheFetchOptions, useCacheIfExists = false) {
     const {client, id, api} = options
 
@@ -9,15 +9,15 @@ export class GuildCache extends Cache<Guild> {
       return this.get(id)
     }
 
-    const data = await client.rest.getGuild(id)
+    const data = await client.rest.getUser(id)
 
     if (data !== null) {
       if (api) {
         return data
       }
 
-      const b = new Guild(data, client)
-      await client.cache.guilds.add(b, true)
+      const b = new User(data, client)
+      await client.cache.users.add(b, true)
       return b
     }
 

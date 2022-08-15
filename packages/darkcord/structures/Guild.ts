@@ -1,11 +1,13 @@
 import {Base} from "./Base.ts"
 import {APIGuild, Snowflake} from "discord-api-types/v10"
-import {Role} from "./Role.ts"
 import {RoleCache} from "../cache/RoleCache.ts"
 import {BaseClient} from "../client/BaseClient.ts"
 import {Permissions} from "./Permissions.ts"
 import {Member} from "./Member.ts"
 import {MemberCache} from "../cache/MemberCache.ts"
+import {StickerCache} from "../cache/StickerCache.ts"
+import {ChannelCacheManager} from "../cache/ChannelCache.ts"
+import {EmojiCache} from "../cache/EmojiCache.ts"
 
 export class Guild extends Base {
   /**
@@ -59,7 +61,10 @@ export class Guild extends Base {
    */
   readonly roles: RoleCache
   readonly members: MemberCache
-  constructor (data: APIGuild, public client: BaseClient) {
+  readonly stickers: StickerCache
+  readonly channels: ChannelCacheManager
+  readonly emojis: EmojiCache
+  constructor (public data: APIGuild, public client: BaseClient) {
     super(data.id)
 
     this.name = data.name
@@ -74,13 +79,12 @@ export class Guild extends Base {
     this.description = data.description
     this.roles = client.cache.factory.makeGuildRolesCache()
     this.members = client.cache.factory.makeMembersCache()
-
-    for (const role of data.roles) {
-      this.roles.add(new Role(role))
-    }
+    this.stickers = client.cache.factory.makeStickersCache()
+    this.channels = client.cache.factory.makeChannelsCacheManager()
+    this.emojis = client.cache.factory.makeEmojiCache()
   }
-  permissionsOf (memberId: Snowflake | Member) {
-    const member: Member | undefined = memberId instanceof Member ? memberId : this.members.get(memberId)
+  async permissionsOf (memberId: Snowflake | Member) {
+    const member: Member | undefined = memberId instanceof Member ? memberId : await this.members.get(memberId)
 
     if (!member) {
       throw new Error("Invalid member")
@@ -90,7 +94,8 @@ export class Guild extends Base {
       return new Permissions(Permissions.All)
     }
 
-    let permissions = this.roles.get(this.id)?.permissions.allow
+    const everyoneRole = await this.roles.get(this.id)
+    let permissions = everyoneRole?.permissions.allow
 
     if (permissions === undefined) {
       return new Permissions(0n)
@@ -100,8 +105,8 @@ export class Guild extends Base {
       return new Permissions(Permissions.All)
     }
 
-    for (const _role of member.roles.keys()) {
-      const role = this.roles.get(_role)
+    for (const _role of await member.roles.keys()) {
+      const role = await this.roles.get(_role)
 
       if (role === undefined) {
         continue

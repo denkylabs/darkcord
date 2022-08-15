@@ -1,5 +1,4 @@
 import type {ReactionCache} from "./../cache/ReactionCache.ts"
-import {Reaction} from "./Emoji.ts"
 import {
   APIMessage,
   APIAttachment,
@@ -16,7 +15,17 @@ import {BaseClient} from "../client/BaseClient.ts"
 import {User} from "./User.ts"
 import {BitField} from "./BitField.ts"
 import {MessageInteraction} from "./Interaction.ts"
+import {CategoryChannel, TextChannel, VoiceChannel} from "./Channel.ts"
 
+export interface MessageAttachment {
+   name: string,
+   blob: Blob,
+   description?: string
+}
+
+export interface MessagePostData extends RESTPostAPIChannelMessageJSONBody {
+   files?: MessageAttachment[]
+}
 class MessageFlags extends BitField<Flags, typeof Flags> {
   constructor (rawFlags: Flags = 0) {
     super(rawFlags, Flags)
@@ -112,8 +121,12 @@ export class Message extends Base {
   /**
     * Sent if the message is a response to an Interaction
     */
-  interaction: MessageInteraction|null
-  constructor (data: APIMessage, client: BaseClient) {
+  interaction: MessageInteraction | null
+  /**
+    * The channel object of the message was sent in
+    */
+  channel?: TextChannel | VoiceChannel | CategoryChannel
+  constructor (public data: APIMessage, public client: BaseClient) {
     super(data.id)
 
     const {edited_timestamp: editedTimestamp, interaction} = data
@@ -130,18 +143,23 @@ export class Message extends Base {
     this.editedTimestamp = editedTimestamp !== undefined ? Date.parse(editedTimestamp as string) : null
     this.messageReference = data.message_reference
     this.nonce = data.nonce
-    this.author = new User(data.author)
+    this.author = new User(data.author, client)
     this.webhookId = data.webhook_id
     this.reactions = client.cache.factory.makeReactionCache()
     this.interaction = interaction !== undefined ? new MessageInteraction(interaction, client) : null
-
-    if (data.reactions !== undefined) {
-      for (const _reaction of data.reactions) {
-        const reaction = new Reaction(_reaction)
-
-        this.reactions.add(reaction)
-      }
-    }
+  }
+  /**
+    * Reply this message
+    * @param data The message post data
+    * @returns
+    */
+  sendReply (data: MessagePostData) {
+    return (this.channel as TextChannel)?.send({
+      message_reference: {
+        message_id: this.id
+      },
+      ...data
+    })
   }
 }
 
