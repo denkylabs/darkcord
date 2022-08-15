@@ -162,3 +162,13 @@ export class Message extends Base {
     })
   }
 }
+
+export interface MessageAttachment {
+   name: string,
+   blob: Blob,
+   description?: string
+}
+
+export interface MessagePostData extends RESTPostAPIChannelMessageJSONBody {
+   files: MessageAttachment[]
+}
