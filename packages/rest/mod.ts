@@ -19,6 +19,7 @@ export abstract class RestAction<Data> {
   constructor (complete: (value: any) => Promise<Data>) {
     this._complete = complete
   }
+
   /**
    * Complete request, add to queue and return structure
    * @param important If this request is important

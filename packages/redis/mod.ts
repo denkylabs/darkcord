@@ -1,5 +1,5 @@
+import { CacheAdapter } from "darkcord/cache"
 import * as redis from "redis"
-import {CacheAdapter} from "darkcord/cache"
 
 /**
  * @example
@@ -32,10 +32,12 @@ export class RedisCacheAdapter<T> implements CacheAdapter<T> {
     this.#instance = await redis.connect(options)
     return this.instance
   }
+
   async set (key: string, value: T) {
     await this.instance.set(key, JSON.stringify(value))
     return this as unknown as CacheAdapter<T>
   }
+
   async get (key: string) {
     const result = await this.instance.hget("darkcord", key)
 
@@ -45,9 +47,11 @@ export class RedisCacheAdapter<T> implements CacheAdapter<T> {
 
     return null
   }
+
   async has (key: string) {
     return !!await this.instance.exists(key)
   }
+
   async entries () {
     const arr = await this.instance.hgetall("darkcord")
     const result = arr.map(async (value) => [value, this.#resolveValue(await this.instance.hget("darkcord", value))])
@@ -57,18 +61,23 @@ export class RedisCacheAdapter<T> implements CacheAdapter<T> {
       }
     })() as unknown as Promise<IterableIterator<[string, T]>>
   }
+
   get size () {
     return this._getSize()
   }
+
   _getSize () {
     return this.instance.hlen("darkcord")
   }
+
   delete (key: string) {
     return !!this.instance.hdel("darkcord", key)
   }
+
   async clear () {
     await this.instance.flushall()
   }
+
   async values () {
     const arr = await this.instance.hgetall("darkcord")
     const result = arr.map(async (value) => this.#resolveValue(await this.instance.hget("darkcord", value)))
@@ -78,6 +87,7 @@ export class RedisCacheAdapter<T> implements CacheAdapter<T> {
       }
     })() as unknown as Promise<IterableIterator<T>>
   }
+
   async keys () {
     const result = await this.instance.hgetall("darkcord")
     return (async function * () {
@@ -86,6 +96,7 @@ export class RedisCacheAdapter<T> implements CacheAdapter<T> {
       }
     })() as unknown as Promise<IterableIterator<string>>
   }
+
   #resolveValue (value: redis.Bulk) {
     try {
       const json = JSON.parse(value as string)
@@ -94,6 +105,7 @@ export class RedisCacheAdapter<T> implements CacheAdapter<T> {
       return value
     }
   }
+
   get instance () {
     if (this.#instance === undefined) {
       throw new Error("Missing redis connection, please connect first.")

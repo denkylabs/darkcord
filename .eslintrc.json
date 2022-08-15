@@ -4,9 +4,15 @@
         "node": true
     },
     "extends": [
-        "standard",
+        "airbnb-base",
+        "plugin:prettier/recommended",
         "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended"
+    ],
+    "ignorePatterns": [
+        "packages/**/node_modules",
+        "node_modules/",
+        ".git/"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -20,18 +26,24 @@
     "rules": {
         "quotes": ["error", "double"],
         "no-spaced-func": "error",
+        "semi": ["error", "always"],
         "require-await": "error",
         "import/no-unresolved": "off",
         "import/extensions": "off",
         "import/prefer-default-export": "off",
-        "lines-between-class-members":  ["error", "never", { "exceptAfterSingleLine": true }],
         "no-underscore-dangle": "off",
-        "object-curly-spacing": ["error", "never"],
         "no-unused-vars": "off",
         "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "([th]is|[public ]|[private ])" }],
         "no-param-reassign": "off",
         "no-useless-call": "off",
         "no-useless-constructor": "off",
-        "@typescript-eslint/no-useless-constructor": "error"
+        "@typescript-eslint/no-useless-constructor": "error",
+        "prettier/prettier": [
+            "error",
+            {},
+            {
+                "usePrettierrc": true
+            }
+        ]
     }
 }

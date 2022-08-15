@@ -1,10 +1,23 @@
 {
   "name": "darkcord",
-  "version": "0.1.0",
-  "description": "A NodeJS and Deno Discord library to interact with api",
-  "license": "MIT",
+  "version": "0.0.1-alpha",
+  "description": "A NodeJS and Deno library to interact with the Discord API",
+  "author": "Liy <liy@denkylabs.com>",
+  "license": "Apache-2.0",
+  "keywords": [
+    "discord",
+    "api",
+    "bot",
+    "node"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/denkylabs/darkcord.git"
+  },
+  "bugs": {
+    "url": "https://github.com/denkylabs/darkcord/issues"
+  },
+  "engines": {
+    "node": ">=16.9.0"
   }
 }

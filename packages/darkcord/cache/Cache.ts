@@ -1,6 +1,6 @@
-import {BaseClient} from "../client/BaseClient.ts"
+import { BaseClient } from "../client/BaseClient.ts";
 
-export * from "darkcord/cache"
+export * from "darkcord/cache";
 
 export interface CacheFetchOptions {
   id: string;

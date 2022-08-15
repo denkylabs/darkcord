@@ -1,7 +1,7 @@
-import {Interaction} from "./structures/Interaction.ts"
-import {GatewayDispatchEvents} from "discord-api-types/v10"
-import {Guild} from "./structures/Guild.ts"
-import {Message} from "./structures/Message.ts"
+import { GatewayDispatchEvents } from "discord-api-types/v10";
+import { Guild } from "./structures/Guild.ts";
+import { Interaction } from "./structures/Interaction.ts";
+import { Message } from "./structures/Message.ts";
 
 export interface ClientEvents {
     WARN: [message: string];
@@ -28,18 +28,18 @@ export type RawClientEvents = {
 }
 
 export enum DarkcordEvents {
-Warn="WARN",
-ShardDebug="GATEWAY_SHARD_DEBUG",
-ShardError="GATEWAY_SHARD_ERROR",
-ShardHello="GATEWAY_SHARD_HELLO",
-ShardPing="GATEWAY_SHARD_PING",
-ShardResume="GATEWAY_SHARD_RESUME",
-ShardClose="GATEWAY_SHARD_CLOSE",
-ShardReconnectRequired="GATEWAY_SHARD_RECONNECT_REQUIRED",
-Connect="CONNECT",
-Reconnecting="RECONNECTING",
-ShardPreReady="SHARD_PRE_READY",
-ShardReady="SHARD_READY",
+  Warn="WARN",
+  ShardDebug="GATEWAY_SHARD_DEBUG",
+  ShardError="GATEWAY_SHARD_ERROR",
+  ShardHello="GATEWAY_SHARD_HELLO",
+  ShardPing="GATEWAY_SHARD_PING",
+  ShardResume="GATEWAY_SHARD_RESUME",
+  ShardClose="GATEWAY_SHARD_CLOSE",
+  ShardReconnectRequired="GATEWAY_SHARD_RECONNECT_REQUIRED",
+  Connect="CONNECT",
+  Reconnecting="RECONNECTING",
+  ShardPreReady="SHARD_PRE_READY",
+  ShardReady="SHARD_READY",
 }
 
 export const Events = {

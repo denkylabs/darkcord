@@ -4,27 +4,29 @@ interface PromiseQueue {
 }
 
 export class AsyncQueue {
-  promises: PromiseQueue[] = []
+  promises: PromiseQueue[] = [];
   get remaining () {
-    return this.promises.length
+    return this.promises.length;
   }
-  wait () {
-    const next = this.promises.length !== 0 ? this.promises[this.promises.length - 1].promise : Promise.resolve()
 
-    let resolveFn: CallableFunction | undefined
+  wait () {
+    const next = this.promises.length !== 0 ? this.promises[this.promises.length - 1].promise : Promise.resolve();
+
+    let resolveFn: CallableFunction | undefined;
     const promise = new Promise(resolve => {
-      resolveFn = resolve
-    })
+      resolveFn = resolve;
+    });
 
     this.promises.push({
       resolve: resolveFn as CallableFunction,
       promise
-    })
+    });
 
-    return next
+    return next;
   }
+
   shift () {
-    const deferred = this.promises.shift()
-    deferred?.resolve()
+    const deferred = this.promises.shift();
+    deferred?.resolve();
   }
 }

@@ -1,8 +1,26 @@
 {
+  "name": "darkcord",
+  "description": "A NodeJS and Deno Discord library to interact with API",
+  "version": "0.0.0",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/denkylabs/darkcord.git"
+  },
+  "bugs": {
+    "url": "https://github.com/denkylabs/darkcord/issues"
+  },
+  "scripts": {
+    "dnt": "run-p dnt:*",
+    "dnt:darkcord": "cd packages/darkcord && deno run -A .dnt.ts",
+    "dnt:rest": "cd packages/rest && deno run -A .dnt.ts"
+  },
+  "author": "Liy <liy@denkylabs.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "discord-api-types": "0.37.1",
+    "ws": "8.8.1"
+  },
   "devDependencies": {
     "@commitlint/cli": "^17.0.3",
     "@commitlint/config-lerna-scopes": "^17.0.2",
@@ -16,20 +34,18 @@
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-n": "^15.0.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-promise": "^6.0.0",
     "husky": "^8.0.1",
     "lerna": "^5.3.0",
     "npm-run-all": "^4.1.5",
+    "prettier": "^2.7.1",
     "typescript": "^4.7.4"
   },
-  "dependencies": {
-    "discord-api-types": "0.37.1",
-    "ws": "8.8.1"
+  "engines": {
+    "node": ">=16.9.0"
   },
-  "scripts": {
-    "dnt": "run-p dnt:*",
-    "dnt:darkcord": "cd packages/darkcord && deno run -A .dnt.ts",
-    "dnt:rest": "cd packages/rest && deno run -A .dnt.ts"
-  },
-  "name": "darkcord"
+  "workspaces": [
+    "packages/*"
+  ]
 }

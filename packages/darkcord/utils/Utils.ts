@@ -1,4 +1,4 @@
-import {GatewayIntentBits} from "discord-api-types/v10"
+import { GatewayIntentBits } from "discord-api-types/v10"
 
 export type DiscordToken = `Bot ${string}`
 export const DefaultIntents = GatewayIntentBits.Guilds

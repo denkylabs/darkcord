@@ -1,20 +1,16 @@
 export class DiscordAPIError extends Error {
-  constructor (
-    public router: string,
-    public method: string,
-    public code: number,
-    errors: Record<string, unknown>) {
-    super()
+  constructor (public router: string, public method: string, public code: number, errors: Record<string, unknown>) {
+    super();
 
-    this.name = "DiscordAPIError"
+    this.name = "DiscordAPIError";
     if (Array.isArray(errors)) {
-      errors.push({code, method, router})
+      errors.push({ code, method, router });
     } else {
-      errors.code = code
-      errors.method = method
-      errors.router = router
+      errors.code = code;
+      errors.method = method;
+      errors.router = router;
     }
-    this.message = JSON.stringify(errors, null, 4)
+    this.message = JSON.stringify(errors, null, 4);
   }
 }
 
@@ -26,7 +22,7 @@ export class RequestError extends Error {
     public name: string,
     public code: number
   ) {
-    super()
-    this.name = "RequestError"
+    super();
+    this.name = "RequestError";
   }
 }
