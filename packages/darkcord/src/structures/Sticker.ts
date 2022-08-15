@@ -1,42 +1,42 @@
-import { APISticker, StickerType } from "discord-api-types/v10";
-import { Base } from "./Base.ts";
+import { APISticker, StickerType } from "discord-api-types/v10"
+import { Base } from "./Base.ts"
 
 export class Sticker extends Base {
   /**
    * Name of the sticker
    */
-  name: string;
+  name: string
   /**
    * For standard stickers, ID of the pack the sticker is from
    */
-  packId?: string;
+  packId?: string
   /**
    * For guild stickers, the Discord name of a unicode emoji representing the sticker's expression.
    * for standard stickers, a comma-separated list of related expressions.
    */
-  tags: string;
+  tags: string
   /**
    * Type of sticker
    *
    * @See https://discord.com/developers/docs/resources/sticker#sticker-object-sticker-types
    */
-  type: StickerType;
+  type: StickerType
   /**
    * Description of the sticker
    */
-  description: string | null;
+  description: string | null
 
   constructor(public data: APISticker) {
-    super(data.id);
+    super(data.id)
 
-    this.name = data.name;
+    this.name = data.name
 
-    this.packId = data.pack_id;
+    this.packId = data.pack_id
 
-    this.tags = data.tags;
+    this.tags = data.tags
 
-    this.type = data.type;
+    this.type = data.type
 
-    this.description = data.description;
+    this.description = data.description
   }
 }

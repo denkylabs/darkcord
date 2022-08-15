@@ -1,12 +1,12 @@
-import { PermissionFlagsBits } from "discord-api-types/v10";
+import { PermissionFlagsBits } from "discord-api-types/v10"
 
 export class Permissions {
-  allow: bigint;
-  deny: bigint;
+  allow: bigint
+  deny: bigint
 
   constructor(allow: bigint, deny = 0) {
-    this.allow = BigInt(allow);
-    this.deny = BigInt(deny);
+    this.allow = BigInt(allow)
+    this.deny = BigInt(deny)
   }
 
   /**
@@ -14,10 +14,10 @@ export class Permissions {
    * @param permissions The permissions bits to verify
    */
   has(permissions: bigint) {
-    return (this.allow & permissions) === permissions;
+    return (this.allow & permissions) === permissions
   }
 
-  static Flags = PermissionFlagsBits;
+  static Flags = PermissionFlagsBits
   static AllText =
     this.Flags.CreateInstantInvite |
     this.Flags.ManageChannels |
@@ -38,7 +38,7 @@ export class Permissions {
     this.Flags.UseApplicationCommands |
     this.Flags.CreatePrivateThreads |
     this.Flags.CreatePublicThreads |
-    this.Flags.SendMessagesInThreads;
+    this.Flags.SendMessagesInThreads
 
   static AllVoice =
     this.Flags.CreateInstantInvite |
@@ -54,7 +54,7 @@ export class Permissions {
     this.Flags.UseVAD |
     this.Flags.ManageRoles |
     this.Flags.RequestToSpeak |
-    this.Flags.UseEmbeddedActivities;
+    this.Flags.UseEmbeddedActivities
 
   static AllGuild =
     this.Flags.KickMembers |
@@ -69,7 +69,7 @@ export class Permissions {
     this.Flags.ManageWebhooks |
     this.Flags.ManageEmojisAndStickers |
     this.Flags.ManageEvents |
-    this.Flags.ModerateMembers;
+    this.Flags.ModerateMembers
 
-  static All = this.AllText | this.AllVoice | this.AllGuild;
+  static All = this.AllText | this.AllVoice | this.AllGuild
 }

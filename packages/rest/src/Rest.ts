@@ -1,4 +1,4 @@
-import EventEmitter from "deno/events";
+import EventEmitter from "deno/events"
 import {
   APIApplication,
   APIGatewayBotInfo,
@@ -9,48 +9,48 @@ import {
   InteractionResponseType,
   RESTPostAPIChannelMessageJSONBody,
   Routes
-} from "discord-api-types/v10";
-import { MessagePostData } from "../../darkcord/src/structures/Message.ts";
-import { RequestHandler } from "./RequestHandler.ts";
+} from "discord-api-types/v10"
+import { MessagePostData } from "../../darkcord/src/structures/Message.ts"
+import { RequestHandler } from "./RequestHandler.ts"
 
 export interface RateLimitEvent {
-  global: boolean;
-  timeout: number;
-  limit: number;
-  router: string;
-  method: string;
+  global: boolean
+  timeout: number
+  limit: number
+  router: string
+  method: string
 }
 
 export interface RestEvents {
-  request: [data: unknown];
-  rateLimit: [event: RateLimitEvent];
-  warn: [message: string];
+  request: [data: unknown]
+  rateLimit: [event: RateLimitEvent]
+  warn: [message: string]
 }
 
 export class Rest extends EventEmitter {
-  requestHandler: RequestHandler;
+  requestHandler: RequestHandler
 
-  get: (router: string) => Promise<unknown>;
-  post: (router: string, body?: BodyInit | undefined, contentType?: string | undefined) => Promise<unknown>;
-  patch: (router: string, body?: BodyInit | undefined, contentType?: string | undefined) => Promise<unknown>;
-  delete: (router: string) => Promise<unknown>;
-  put: (router: string, body?: BodyInit | undefined, contentType?: string | undefined) => Promise<unknown>;
+  get: (router: string) => Promise<unknown>
+  post: (router: string, body?: BodyInit | undefined, contentType?: string | undefined) => Promise<unknown>
+  patch: (router: string, body?: BodyInit | undefined, contentType?: string | undefined) => Promise<unknown>
+  delete: (router: string) => Promise<unknown>
+  put: (router: string, body?: BodyInit | undefined, contentType?: string | undefined) => Promise<unknown>
 
   constructor(token?: string, public requestTimeout = 15_000) {
-    super();
+    super()
     this.requestHandler = new RequestHandler(this, {
       token
-    });
+    })
 
-    this.get = this.requestHandler.get.bind(this.requestHandler);
+    this.get = this.requestHandler.get.bind(this.requestHandler)
 
-    this.post = this.requestHandler.post.bind(this.requestHandler);
+    this.post = this.requestHandler.post.bind(this.requestHandler)
 
-    this.patch = this.requestHandler.patch.bind(this.requestHandler);
+    this.patch = this.requestHandler.patch.bind(this.requestHandler)
 
-    this.delete = this.requestHandler.delete.bind(this.requestHandler);
+    this.delete = this.requestHandler.delete.bind(this.requestHandler)
 
-    this.put = this.requestHandler.put.bind(this.requestHandler);
+    this.put = this.requestHandler.put.bind(this.requestHandler)
   }
 
   /**
@@ -61,62 +61,62 @@ export class Rest extends EventEmitter {
    * @param channelId The id of channel to create message
    */
   createMessage(channelId: string, data: RESTPostAPIChannelMessageJSONBody, files?: { name: string; description?: string; blob: Blob }[]): Promise<APIMessage> {
-    let d: FormData | string;
-    let contentType: string | undefined;
+    let d: FormData | string
+    let contentType: string | undefined
 
     if (files?.length) {
-      contentType = undefined;
-      const form = new FormData();
+      contentType = undefined
+      const form = new FormData()
 
-      let index = 0;
+      let index = 0
       for (const file of files) {
-        form.append(`files[${index}]`, file.blob, file.name);
-        index++;
+        form.append(`files[${index}]`, file.blob, file.name)
+        index++
       }
 
-      delete (data as MessagePostData).files;
+      delete (data as MessagePostData).files
 
       data.attachments = files.map((file, i) => ({
         id: i.toString(),
         filename: file.name,
         description: file.description
-      }));
+      }))
 
-      form.append("payload_json", JSON.stringify(data));
-      d = form;
+      form.append("payload_json", JSON.stringify(data))
+      d = form
     } else {
-      contentType = "application/json";
-      d = JSON.stringify(data);
+      contentType = "application/json"
+      d = JSON.stringify(data)
     }
 
-    return this.post(Routes.channelMessages(channelId), d, contentType) as Promise<APIMessage>;
+    return this.post(Routes.channelMessages(channelId), d, contentType) as Promise<APIMessage>
   }
 
   respondInteraction(interactionId: string, interactionToken: string, data: APIInteractionResponseCallbackData, type: InteractionResponseType) {
-    return this.post(Routes.interactionCallback(interactionId, interactionToken), JSON.stringify({ type, data }));
+    return this.post(Routes.interactionCallback(interactionId, interactionToken), JSON.stringify({ type, data }))
   }
 
   getWebhookMessage(webhookId: string, webhookToken: string, messageId: string): Promise<APIMessage> {
-    return this.get(Routes.webhookMessage(webhookId, webhookToken, messageId)) as Promise<APIMessage>;
+    return this.get(Routes.webhookMessage(webhookId, webhookToken, messageId)) as Promise<APIMessage>
   }
 
   getUser(userId: string) {
-    return this.get(Routes.user(userId)) as Promise<APIUser>;
+    return this.get(Routes.user(userId)) as Promise<APIUser>
   }
 
   getGuild(guildId: string) {
-    return this.get(Routes.guild(guildId)) as Promise<APIGuild>;
+    return this.get(Routes.guild(guildId)) as Promise<APIGuild>
   }
 
   getGateway() {
-    return this.get(Routes.gatewayBot()) as Promise<APIGatewayBotInfo>;
+    return this.get(Routes.gatewayBot()) as Promise<APIGatewayBotInfo>
   }
 
   getCurrentApplication() {
-    return this.get(Routes.oauth2CurrentApplication()) as Promise<APIApplication>;
+    return this.get(Routes.oauth2CurrentApplication()) as Promise<APIApplication>
   }
 }
 export declare interface Rest {
-  on<E extends keyof RestEvents>(event: E, listener: (...args: RestEvents[E]) => unknown): this;
-  emit<E extends keyof RestEvents>(event: E, data: unknown): boolean;
+  on<E extends keyof RestEvents>(event: E, listener: (...args: RestEvents[E]) => unknown): this
+  emit<E extends keyof RestEvents>(event: E, data: unknown): boolean
 }

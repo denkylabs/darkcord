@@ -1,52 +1,52 @@
-import { APIUser, LocaleString, UserFlags as Flags, UserPremiumType } from "discord-api-types/v10";
-import { BaseClient } from "../client/BaseClient.ts";
-import { Base } from "./Base.ts";
+import { APIUser, LocaleString, UserFlags as Flags, UserPremiumType } from "discord-api-types/v10"
+import { BaseClient } from "../client/BaseClient.ts"
+import { Base } from "./Base.ts"
 
 export class UserFlags {
   // eslint-disable-next-line
   constructor(public rawFlags: Flags) {}
   has(flags: Flags) {
-    return (flags & this.rawFlags) === flags;
+    return (flags & this.rawFlags) === flags
   }
 
-  static Flags = Flags;
+  static Flags = Flags
 }
 export class User extends Base {
-  readonly username: string;
-  readonly discriminator: string;
-  readonly avatar: string | null;
-  readonly isBot?: boolean;
-  readonly isSystem?: boolean;
-  readonly mfaEnabled?: boolean;
-  readonly banner?: string | null;
-  readonly accentColor?: number | null;
-  readonly locale?: LocaleString;
-  readonly nitroType?: UserPremiumType;
-  readonly publicFlags?: UserFlags;
+  readonly username: string
+  readonly discriminator: string
+  readonly avatar: string | null
+  readonly isBot?: boolean
+  readonly isSystem?: boolean
+  readonly mfaEnabled?: boolean
+  readonly banner?: string | null
+  readonly accentColor?: number | null
+  readonly locale?: LocaleString
+  readonly nitroType?: UserPremiumType
+  readonly publicFlags?: UserFlags
 
   constructor(data: APIUser, public client: BaseClient) {
-    super(data.id);
+    super(data.id)
 
-    this.username = data.username;
+    this.username = data.username
 
-    this.discriminator = data.discriminator;
+    this.discriminator = data.discriminator
 
-    this.avatar = data.avatar;
+    this.avatar = data.avatar
 
-    this.isBot = data.bot;
+    this.isBot = data.bot
 
-    this.isSystem = data.system;
+    this.isSystem = data.system
 
-    this.mfaEnabled = data.mfa_enabled;
+    this.mfaEnabled = data.mfa_enabled
 
-    this.banner = data.banner;
+    this.banner = data.banner
 
-    this.accentColor = data.accent_color;
+    this.accentColor = data.accent_color
 
-    this.locale = data.locale as LocaleString;
+    this.locale = data.locale as LocaleString
 
-    this.publicFlags = new UserFlags(Number(data.public_flags));
+    this.publicFlags = new UserFlags(Number(data.public_flags))
 
-    this.nitroType = data.premium_type;
+    this.nitroType = data.premium_type
   }
 }
