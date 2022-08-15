@@ -11,6 +11,10 @@
     "node",
     "rest"
   ],
+  "scripts": {
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/denkylabs/darkcord.git"

@@ -13,7 +13,9 @@
   "scripts": {
     "dnt": "run-p dnt:*",
     "dnt:darkcord": "cd packages/darkcord && deno run -A .dnt.ts",
-    "dnt:rest": "cd packages/rest && deno run -A .dnt.ts"
+    "dnt:rest": "cd packages/rest && deno run -A .dnt.ts",
+    "lint": "lerna run lint",
+    "lint:fix": "lerna run lint:fix"
   },
   "author": "Liy <liy@denkylabs.com>",
   "license": "Apache-2.0",
