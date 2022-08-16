@@ -1,10 +1,28 @@
 {
-  "name": "rest",
+  "name": "@darkcord/rest",
   "version": "0.1.0",
-  "description": "Library to made Api requests in darkcord",
-  "license": "MIT",
+  "description": "Library to made API requests in darkcord",
+  "author": "Liy <liy@denkylabs.com>",
+  "license": "Apache-2.0",
+  "keywords": [
+    "discord",
+    "api",
+    "bot",
+    "node",
+    "rest"
+  ],
+  "scripts": {
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/denkylabs/darkcord.git"
+  },
+  "bugs": {
+    "url": "https://github.com/denkylabs/darkcord/issues"
+  },
+  "engines": {
+    "node": ">=16.9.0"
   }
 }

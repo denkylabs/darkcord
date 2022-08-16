@@ -1,15 +1,14 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import {Snowflake} from "discord-api-types/v10"
+import { Snowflake } from "discord-api-types/v10"
 
 export interface BaseCacheSweeper<T> {
-    lifetime?: number;
-    filter?: (value: T) => boolean;
-    keepFilter?: (value: T) => boolean;
+  lifetime?: number
+  filter?: (value: T) => boolean
+  keepFilter?: (value: T) => boolean
 }
 
 export interface BaseCacheOptions<T = unknown> {
-    maxSize: number;
-    sweeper?: BaseCacheSweeper<T>;
+  maxSize: number
+  sweeper?: BaseCacheSweeper<T>
 }
 
 type Awaitable<T> = T | Promise<T>
@@ -34,6 +33,7 @@ export interface CacheAdapter<T> {
 export class Cache<T = unknown> {
   readonly #limit: number
   readonly #sweeper?: BaseCacheSweeper<T>
+
   // eslint-disable-next-line no-use-before-define
   _set: (key: string, value: T) => Awaitable<CacheAdapter<T>>
   delete: (key: string) => Awaitable<boolean>
@@ -45,10 +45,11 @@ export class Cache<T = unknown> {
   _getSize: () => Awaitable<number>
   keys: () => Awaitable<IterableIterator<string>>
   has: (key: string) => Awaitable<boolean>
+
   constructor(limit?: BaseCacheOptions<T> | number, adapter?: CacheAdapter<T>)
   constructor(limit: number)
   constructor(options: BaseCacheOptions<T>)
-  constructor (limit: BaseCacheOptions<T> | number = 100, adapter?: CacheAdapter<T>) {
+  constructor(limit: BaseCacheOptions<T> | number = 100, adapter?: CacheAdapter<T>) {
     if (typeof limit === "object") {
       this.#limit = limit.maxSize
       this.#sweeper = limit.sweeper as unknown as BaseCacheSweeper<T>
@@ -61,10 +62,12 @@ export class Cache<T = unknown> {
       this.#map = new Map()
     }
 
-    this._set = adapter?.set ?? ((key, value) => {
-      this.#map?.set(key, value)
-      return this as CacheAdapter<T>
-    })
+    this._set =
+      adapter?.set ??
+      ((key, value) => {
+        this.#map?.set(key, value)
+        return this as CacheAdapter<T>
+      })
     this.get = adapter?.get.bind(adapter) ?? this.#map!.get.bind(this.#map)
     this.delete = adapter?.delete.bind(adapter) ?? this.#map!.delete.bind(this.#map)
     this.clear = adapter?.clear.bind(adapter) ?? this.#map!.clear.bind(this.#map)
@@ -74,15 +77,20 @@ export class Cache<T = unknown> {
     this.has = adapter?.has.bind(adapter) ?? this.#map!.has.bind(this.#map)
     this._getSize = adapter?._getSize ?? (() => this.#map?.size as number)
   }
-  get size (): number | Promise<number> {
+
+  get size(): number | Promise<number> {
     return this._getSize()
   }
-  get extender (): new () => Cache<T> {
-    return (this.constructor as unknown as {
-      [Symbol.species]: typeof Cache
-    })[Symbol.species]
+
+  get extender(): new () => Cache<T> {
+    return (
+      this.constructor as unknown as {
+        [Symbol.species]: typeof Cache
+      }
+    )[Symbol.species]
   }
-  async filter (filter: (value: T, key: string) => boolean) {
+
+  async filter(filter: (value: T, key: string) => boolean) {
     // eslint-disable-next-line new-cap
     const cache = new this.extender() as Cache<T>
 
@@ -94,19 +102,24 @@ export class Cache<T = unknown> {
 
     return cache
   }
-  async forEach (fn: (value: T, key: string) => void) {
+
+  async forEach(fn: (value: T, key: string) => void) {
     for (const [key, value] of await this.entries()) {
       fn(value, key)
     }
   }
-  async find (findFn: (value: T, key: string) => boolean) {
+
+  async find(findFn: (value: T, key: string) => boolean) {
     for (const [key, value] of await this.entries()) {
       if (findFn(value, key) === true) {
         return value
       }
     }
+
+    return null
   }
-  async reduce<I> (reduceFn: (accumulator: I, value: T, key: string) => I, initialValue?: I) {
+
+  async reduce<I>(reduceFn: (accumulator: I, value: T, key: string) => I, initialValue?: I) {
     let accumulator = initialValue as I
     let first = false
 
@@ -129,7 +142,8 @@ export class Cache<T = unknown> {
 
     return accumulator
   }
-  async set (key: string, value: T) {
+
+  async set(key: string, value: T) {
     if (this.#sweeper?.filter !== undefined && this.#sweeper.filter(value) === false) {
       return this
     }
@@ -146,7 +160,8 @@ export class Cache<T = unknown> {
 
     return this
   }
-  async add (item: T, replace = false, id?: string) {
+
+  async add(item: T, replace = false, id?: string) {
     if (id === undefined) {
       id = (item as TWithID<T>).id
     }
@@ -158,7 +173,8 @@ export class Cache<T = unknown> {
     await this.set(id, item)
     return item
   }
-  async #removeToLimit () {
+
+  async #removeToLimit() {
     const keys = await this.keys()
 
     while (this.size >= this.#limit) {

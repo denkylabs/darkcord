@@ -1,8 +1,0 @@
-export * from "./Base.ts"
-export * from "./Role.ts"
-export * from "./Member.ts"
-export * from "./Interaction.ts"
-export * as PermissionsBitfield from "./Permissions.ts"
-export * as SnowflakeUtil from "./Snowflake.ts"
-export * from "./BitField.ts"
-export * from "./Sticker.ts"

@@ -1,18 +1,18 @@
 {
-  "name": "darkcord",
-  "version": "0.0.1-alpha",
-  "description": "A NodeJS and Deno library to interact with the Discord API",
+  "name": "@darkcord/cache",
+  "version": "0.1.0",
+  "description": "Utility cache structure used in darkcord",
   "author": "Liy <liy@denkylabs.com>",
   "license": "Apache-2.0",
   "keywords": [
-    "discord",
-    "api",
-    "bot",
-    "node"
+    "node",
+    "cache",
+    "data", 
+    "utility"
   ],
   "scripts": {
-    "lint": "eslint src",
-    "lint:fix": "eslint src --fix"
+    "lint": "eslint",
+    "lint:fix": "eslint --fix"
   },
   "repository": {
     "type": "git",

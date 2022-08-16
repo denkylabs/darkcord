@@ -1,0 +1,8 @@
+addReviewers: true
+
+addAssignees: false
+
+reviewers:
+  - JustAWaifuHunter
+
+numberOfReviewers: 0

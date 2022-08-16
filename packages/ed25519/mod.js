@@ -1,11 +1,3 @@
-/* eslint-disable no-mixed-operators */
-/* eslint-disable new-cap */
-/* eslint-disable camelcase */
-/* eslint-disable no-lone-blocks */
-/* eslint-disable no-var */
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-sequences */
-/* eslint-disable no-use-before-define */
 let wasm
 
 {
