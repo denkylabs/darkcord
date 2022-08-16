@@ -5,3 +5,4 @@
 /node
 /.vscode
 **/**.dnt.ts
+.idea

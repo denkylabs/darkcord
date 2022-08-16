@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export * from "./AsyncBucket.ts"
-export * from "./AsyncQueue.ts"
-export * from "./RequestHandler.ts"
-export * from "./Rest.ts"
-export * from "./SequentialBucket.ts"
+export * from "./src/AsyncBucket.ts"
+export * from "./src/AsyncQueue.ts"
+export * from "./src/RequestHandler.ts"
+export * from "./src/Rest.ts"
+export * from "./src/SequentialBucket.ts"
 
 export interface RestActionQueueOptions {
-  sendIn?: number;
-  isImportant?: boolean;
+  sendIn?: number
+  isImportant?: boolean
 }
 
 export interface RestActionCompleteOptions extends RestActionQueueOptions {
@@ -16,9 +16,10 @@ export interface RestActionCompleteOptions extends RestActionQueueOptions {
 
 export abstract class RestAction<Data> {
   _complete: (value: any) => Promise<Data>
-  constructor (complete: (value: any) => Promise<Data>) {
+  constructor(complete: (value: any) => Promise<Data>) {
     this._complete = complete
   }
+
   /**
    * Complete request, add to queue and return structure
    * @param important If this request is important

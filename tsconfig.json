@@ -17,6 +17,7 @@
       }
     ]
   },
+  "include": ["packages/**/*.ts", "packages/**/package.json"],
   "exclude": [
     "node_modules"
   ]
