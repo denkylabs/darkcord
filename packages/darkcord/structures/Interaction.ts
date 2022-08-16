@@ -110,7 +110,6 @@ export class ApplicationCommandInteraction extends Interaction {
   }
   reply (data: APIInteractionResponseCallbackData) {
     const action = InteractionRespondRestAction.createAction(this, data, async (d) => {
-    
       if (this.#respondInteraction !== undefined) {
         const respond = this.#respondInteraction as RespondFunc
 
