@@ -1,0 +1,22 @@
+"package: cache":
+  - packages/cache/**/*.ts
+
+"package: darkcord":
+  - packages/darkcord/**/*.ts
+
+"package: ed25519":
+  - packages/ed25519/**/*.ts
+
+"package: redis":
+  - packages/redis/**/*.ts
+
+"package: rest":
+  - packages/rest/**/*.ts
+
+"meta: dependencies":
+  - packages/**/package.json
+  - package.json
+  - yarn.lock
+
+"meta: github":
+  - .github/**/*
