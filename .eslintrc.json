@@ -12,13 +12,14 @@
     "ignorePatterns": [
         "packages/**/node_modules",
         "node_modules/",
+        "dnt/",
         ".git/"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaVersion": "latest",
         "sourceType": "module",
-        "project": "./tsconfig.json"
+        "project": ["./tsconfig.json"]
     },
     "plugins": [
         "@typescript-eslint"
