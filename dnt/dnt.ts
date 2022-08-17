@@ -1,6 +1,6 @@
-import * as colors from "https://deno.land/std@0.152.0/fmt/colors.ts"
+import * as colors from "https://deno.land/std@0.152.0/fmt/colors.ts";
+import { build, emptyDir } from "https://deno.land/x/dnt@0.29.1/mod.ts";
 import { SpecifierMappings } from "https://deno.land/x/dnt@0.29.1/transform.ts";
-import { build, emptyDir } from "https://deno.land/x/dnt@0.29.1/mod.ts"
 
 async function getMainFile(_package: string) {
   try {
@@ -27,6 +27,8 @@ for await (const dir of Deno.readDir("../packages")) {
     const packageJSON = await getPackageJSON(dir.name)
     const main = await getMainFile(dir.name)
     await emptyDir("../node" + packagePath)
+    Deno.copyFileSync(`../packages/${dir.name}/LICENSE`, `../node${packagePath}/LICENSE`);
+    Deno.copyFileSync(`../packages/${dir.name}/README.md`, `../node${packagePath}/README.md`);
 
     console.log("[dnt]", colors.italic(colors.blue(`${packagePath} => ${"/node" + packagePath}`)))
 
